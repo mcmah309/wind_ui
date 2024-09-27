@@ -1,0 +1,3 @@
+library wind;
+
+class Temp {}
