@@ -1,3 +1,3 @@
 library wind;
 
-class Temp {}
+export 'src/wind.dart';
