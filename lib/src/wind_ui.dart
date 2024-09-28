@@ -77,14 +77,14 @@ abstract mixin class Brightness {
 }
 
 abstract mixin class Font {
-  FontSize get textXs => const FontSize(fontSize: 12, height: 16);
-  FontSize get textSm => const FontSize(fontSize: 14, height: 20);
-  FontSize get textBase => const FontSize(fontSize: 16, height: 24);
-  FontSize get textLg => const FontSize(fontSize: 18, height: 28);
-  FontSize get textXl => const FontSize(fontSize: 20, height: 28);
-  FontSize get text2Xl => const FontSize(fontSize: 24, height: 32);
-  FontSize get text3Xl => const FontSize(fontSize: 30, height: 36);
-  FontSize get text4Xl => const FontSize(fontSize: 36, height: 40);
+  FontSize get textXs => const FontSize(fontSize: 12, height: 1 + 1/3);
+  FontSize get textSm => const FontSize(fontSize: 14, height: 1 + 3/7);
+  FontSize get textBase => const FontSize(fontSize: 16, height: 1.25);
+  FontSize get textLg => const FontSize(fontSize: 18, height: 1 + 5/9);
+  FontSize get textXl => const FontSize(fontSize: 20, height: 1.4);
+  FontSize get text2Xl => const FontSize(fontSize: 24, height: 1 + 1/3);
+  FontSize get text3Xl => const FontSize(fontSize: 30, height: 1.2);
+  FontSize get text4Xl => const FontSize(fontSize: 36, height: 1 + 1/9);
   FontSize get text5Xl => const FontSize(fontSize: 48);
   FontSize get text6Xl => const FontSize(fontSize: 60);
   FontSize get text7Xl => const FontSize(fontSize: 72);
