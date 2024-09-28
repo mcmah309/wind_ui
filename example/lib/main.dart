@@ -221,8 +221,20 @@ class Color2Test extends StatelessWidget {
             test(Colors2.greyCool, "Grey Cool"),
             test(Colors2.greyWarm, "Grey Warm"),
             test(Colors2.greyScale, "Grey Scale"),
-            test(ShadeColor2.greyScale(startLightness: 1, endLightness: 0, curve: Curves.easeInOutQuint), "Grey Scale Parabolic Curve"),
-            test(ShadeColor2.greyScale(startLightness: 1, endLightness: 0, curve: Curves.slowMiddle), "Grey Scale Slow Middle Curve"),
+            test(
+                ShadeColor2.greyScale(
+                    startLightness: 1,
+                    endLightness: 0,
+                    lightnessCurve: Curves.easeInOutQuint,
+                    saturationCurve: Curves.easeInOutQuint),
+                "Grey Scale Parabolic Curve"),
+            test(
+                ShadeColor2.greyScale(
+                    startLightness: 1,
+                    endLightness: 0,
+                    lightnessCurve: Curves.slowMiddle,
+                    saturationCurve: Curves.slowMiddle),
+                "Grey Scale Slow Middle Curve"),
             test(Colors2.greyScaleDark, "Grey Scale Dark"),
             test(Colors2.greyScaleLight, "Grey Scale Light"),
             test(Color2.material(Colors.red), "A material color"),

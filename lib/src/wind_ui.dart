@@ -1,3 +1,5 @@
+import 'dart:ui';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/material.dart' as material;
 import 'package:meta/meta.dart';
@@ -227,13 +229,17 @@ abstract class Color2 extends MaterialColor {
       {required double hue,
       SL lightestShade = const SL(saturation: 1, lightness: 1),
       SL darkestShade = const SL(saturation: 1, lightness: 0),
-      Curve curve = Curves.linear,
+      Curve alphaCurve = Curves.linear,
+      Curve saturationCurve = Curves.linear,
+      Curve lightnessCurve = Curves.linear,
       String? label}) {
     return ShadeColor2(
         hue: hue,
         lightestShade: lightestShade,
         darkestShade: darkestShade,
-        curve: curve,
+        alphaCurve: alphaCurve,
+        saturationCurve: saturationCurve,
+        lightnessCurve: lightnessCurve,
         label: label);
   }
 
@@ -241,12 +247,16 @@ abstract class Color2 extends MaterialColor {
   factory Color2.greyScale(
       {required double startLightness,
       required double endLightness,
-      Curve curve = Curves.linear,
+      Curve alphaCurve = Curves.linear,
+      Curve saturationCurve = Curves.linear,
+      Curve lightnessCurve = Curves.linear,
       String? label}) {
     return ShadeColor2.greyScale(
         startLightness: startLightness,
         endLightness: endLightness,
-        curve: curve,
+        alphaCurve: alphaCurve,
+        saturationCurve: saturationCurve,
+        lightnessCurve: lightnessCurve,
         label: label);
   }
 
@@ -344,7 +354,8 @@ class ExplictColor2 extends Color2 {
       }
       double t = 1 / (nextColorIndex - lastIndex);
       assert(t < 1 && t > 0);
-      return _interpolate(lastColor, nextColor!, t);
+      return _interpolate(
+          from: lastColor, to: nextColor!, tAlpha: t, tHue: t, tSaturation: t, tLightness: t);
     }
 
     for (int index = 0; index < colors.length; index++) {
@@ -357,9 +368,12 @@ class ExplictColor2 extends Color2 {
     final medium = colorsC[4].toColor();
     final swatch = {
       50: _interpolate(
-              HSLColor.fromAHSL(shade100.alpha, shade100.hue, shade100.saturation, 1),
-              shade100,
-              0.5)
+              from: HSLColor.fromAHSL(shade100.alpha, shade100.hue, shade100.saturation, 1),
+              to: shade100,
+              tAlpha: 0.5,
+              tHue: 0.5,
+              tSaturation: 0.5,
+              tLightness: 0.5)
           .toColor(),
       100: shade100.toColor(),
       200: colorsC[1].toColor(),
@@ -382,23 +396,28 @@ class ShadeColor2 extends Color2 {
   final double hue;
   final SL lightestShade;
   final SL darkestShade;
+
   /// A function that curves between two [HSLColor]s. Given linear position `t` between 0.0 and 1.0 (The two shades),
   /// return the new `t`. e.g. [Curves.linear] return an unmodified `t`.
-  final Curve curve;
-
+  /// Other useful curves:
+  /// - [Curves.easeInOutQuint] : Slow transition on the ends, Fast in the middle
+  /// - [Curves.slowMiddle] : Fast on the ends, Slow transition for middle
+  /// Tip:
+  /// If you don’t want the lighter and darker shades of a given
+  /// color to look washed out, you need to increase the saturation as the
+  /// lightness gets further away from 50%.
   factory ShadeColor2(
       {required double hue,
       required SL lightestShade,
       required SL darkestShade,
-      Curve curve = Curves.linear,
+      Curve alphaCurve = Curves.linear,
+      Curve saturationCurve = Curves.linear,
+      Curve lightnessCurve = Curves.linear,
       String? label}) {
-    final shade100Hsl =
-        HSLColor.fromAHSL(1, hue, lightestShade.saturation, lightestShade.lightness);
-    final shade900Hsl = HSLColor.fromAHSL(1, hue, darkestShade.saturation, darkestShade.lightness);
-
-    final shade300Hsl = _interpolate(shade100Hsl, shade900Hsl, curve.transform(0.25));
-    final shade500Hsl = _interpolate(shade100Hsl, shade900Hsl, curve.transform(0.5));
-    final shade700Hsl = _interpolate(shade100Hsl, shade900Hsl, curve.transform(0.75));
+    final shade100Hsl = HSLColor.fromAHSL(
+        lightestShade.alpha, hue, lightestShade.saturation, lightestShade.lightness);
+    final shade900Hsl =
+        HSLColor.fromAHSL(darkestShade.alpha, hue, darkestShade.saturation, darkestShade.lightness);
 
     const end = 900;
     const start = 100;
@@ -409,42 +428,112 @@ class ShadeColor2 extends Color2 {
 
     assert(t(300) == 0.25 && t(500) == 0.5 && t(700) == 0.75, "You did your math wrong buddy.");
 
+    double tVal = t(200);
+    final shade200Hsl = _interpolate(
+        from: shade100Hsl,
+        to: shade900Hsl,
+        tAlpha: alphaCurve.transform(tVal),
+        tHue: tVal,
+        tSaturation: saturationCurve.transform(tVal),
+        tLightness: lightnessCurve.transform(tVal));
+
+    tVal = t(300);
+    final shade300Hsl = _interpolate(
+        from: shade100Hsl,
+        to: shade900Hsl,
+        tAlpha: alphaCurve.transform(tVal),
+        tHue: tVal,
+        tSaturation: saturationCurve.transform(tVal),
+        tLightness: lightnessCurve.transform(tVal));
+
+    tVal = t(400);
+    final shade400Hsl = _interpolate(
+        from: shade100Hsl,
+        to: shade900Hsl,
+        tAlpha: alphaCurve.transform(tVal),
+        tHue: tVal,
+        tSaturation: saturationCurve.transform(tVal),
+        tLightness: lightnessCurve.transform(tVal));
+
+    tVal = t(500);
+    final shade500Hsl = _interpolate(
+        from: shade100Hsl,
+        to: shade900Hsl,
+        tAlpha: alphaCurve.transform(tVal),
+        tHue: tVal,
+        tSaturation: saturationCurve.transform(tVal),
+        tLightness: lightnessCurve.transform(tVal));
+
     final shade500 = shade500Hsl.toColor();
+
+    tVal = t(600);
+    final shade600Hsl = _interpolate(
+        from: shade100Hsl,
+        to: shade900Hsl,
+        tAlpha: alphaCurve.transform(tVal),
+        tHue: tVal,
+        tSaturation: saturationCurve.transform(tVal),
+        tLightness: lightnessCurve.transform(tVal));
+
+    tVal = t(700);
+    final shade700Hsl = _interpolate(
+        from: shade100Hsl,
+        to: shade900Hsl,
+        tAlpha: alphaCurve.transform(tVal),
+        tHue: tVal,
+        tSaturation: saturationCurve.transform(tVal),
+        tLightness: lightnessCurve.transform(tVal));
+
+    tVal = t(800);
+    final shade800Hsl = _interpolate(
+        from: shade100Hsl,
+        to: shade900Hsl,
+        tAlpha: alphaCurve.transform(tVal),
+        tHue: tVal,
+        tSaturation: saturationCurve.transform(tVal),
+        tLightness: lightnessCurve.transform(tVal));
+
     final swatch = {
       50: _interpolate(
-              HSLColor.fromAHSL(shade100Hsl.alpha, shade100Hsl.hue, shade100Hsl.saturation, 1),
-              shade100Hsl,
-              0.5)
+              from:
+                  HSLColor.fromAHSL(shade100Hsl.alpha, shade100Hsl.hue, shade100Hsl.saturation, 1),
+              to: shade100Hsl,
+              tAlpha: 0.5,
+              tHue: 0.5,
+              tSaturation: 0.5,
+              tLightness: 0.5)
           .toColor(),
       100: shade100Hsl.toColor(),
-      200: _interpolate(shade100Hsl, shade900Hsl, curve.transform(t(200))).toColor(),
+      200: shade200Hsl.toColor(),
       300: shade300Hsl.toColor(),
-      400: _interpolate(shade100Hsl, shade900Hsl, curve.transform(t(400))).toColor(),
+      400: shade400Hsl.toColor(),
       500: shade500,
-      600: _interpolate(shade100Hsl, shade900Hsl, curve.transform(t(600))).toColor(),
+      600: shade600Hsl.toColor(),
       700: shade700Hsl.toColor(),
-      800: _interpolate(shade100Hsl, shade900Hsl, curve.transform(t(800))).toColor(),
+      800: shade800Hsl.toColor(),
       900: shade900Hsl.toColor()
     };
 
     return ShadeColor2._(shade500.value, swatch,
-        hue: hue,
-        lightestShade: lightestShade,
-        darkestShade: darkestShade,
-        curve: curve,
-        label: label);
+        hue: hue, lightestShade: lightestShade, darkestShade: darkestShade, label: label);
   }
 
   factory ShadeColor2.greyScale(
       {required double startLightness,
       required double endLightness,
-      Curve curve = Curves.linear,
+      Curve alphaCurve = Curves.linear,
+      Curve saturationCurve = Curves.linear,
+      Curve lightnessCurve = Curves.linear,
+      double startAlpha = 1,
+      double endAlpha = 1,
       String? label}) {
     return ShadeColor2(
         hue: 0,
-        lightestShade: SL(saturation: 0, lightness: startLightness),
-        darkestShade: SL(saturation: 0, lightness: endLightness),
-        curve: curve,
+        lightestShade: SL(saturation: 0, lightness: startLightness, alpha: startAlpha),
+        darkestShade: SL(saturation: 0, lightness: endLightness, alpha: endAlpha),
+        alphaCurve: alphaCurve,
+        saturationCurve: saturationCurve,
+        lightnessCurve: lightnessCurve,
         label: label);
   }
 
@@ -456,11 +545,7 @@ class ShadeColor2 extends Color2 {
   }
 
   ShadeColor2._(super.primary, super.swatch,
-      {required this.hue,
-      required this.lightestShade,
-      required this.darkestShade,
-      this.curve = Curves.linear,
-      super.label});
+      {required this.hue, required this.lightestShade, required this.darkestShade, super.label});
 }
 
 class MaterialColor2 extends Color2 {
@@ -473,12 +558,28 @@ class MaterialColor2 extends Color2 {
 class SL {
   final double saturation;
   final double lightness;
+  final double alpha;
 
-  const SL({required this.saturation, required this.lightness});
+  const SL({required this.saturation, required this.lightness, this.alpha = 1});
 }
 
-HSLColor _interpolate(HSLColor from, HSLColor to, double t) {
-  return HSLColor.lerp(from, to, t)!;
+// Dev Note: Taken originally from [HSLColor.lerp]
+HSLColor _interpolate(
+    {required HSLColor from,
+    required HSLColor to,
+    required double tAlpha,
+    required double tHue,
+    required double tSaturation,
+    required double tLightness}) {
+  if (identical(from, to)) {
+    return from;
+  }
+  return HSLColor.fromAHSL(
+    clampDouble(lerpDouble(from.alpha, to.alpha, tAlpha)!, 0.0, 1.0),
+    lerpDouble(from.hue, to.hue, tHue)! % 360.0,
+    clampDouble(lerpDouble(from.saturation, from.saturation, tSaturation)!, 0.0, 1.0),
+    clampDouble(lerpDouble(from.lightness, to.lightness, tLightness)!, 0.0, 1.0),
+  );
 }
 
 class Colors2 {
