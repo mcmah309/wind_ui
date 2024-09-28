@@ -164,20 +164,35 @@ abstract class Color2 extends MaterialColor {
   /// The label for this color e.g. "background" or "primary"
   final String? label;
 
+  /// Equivlent to [shade50]
+  HSLColor get shade50Hsl => HSLColor.fromColor(shade50);
+
   /// Light shade. Equivlent to [shade100]
-  HSLColor get shade100Hsl;
+  HSLColor get shade100Hsl => HSLColor.fromColor(shade100);
+
+  /// Equivlent to [shade200]
+  HSLColor get shade200Hsl => HSLColor.fromColor(shade200);
 
   /// Medium light shade. Equivlent to [shade300]
-  HSLColor get shade300Hsl;
+  HSLColor get shade300Hsl => HSLColor.fromColor(shade300);
+
+  /// Equivlent to [shade400]
+  HSLColor get shade400Hsl => HSLColor.fromColor(shade400);
 
   /// Medium shade. Equivlent to [shade500]
-  HSLColor get shade500Hsl;
+  HSLColor get shade500Hsl => HSLColor.fromColor(shade500);
+
+  /// Equivlent to [shade600]
+  HSLColor get shade600Hsl => HSLColor.fromColor(shade600);
 
   /// Medium dark shade. Equivlent to [shade700]
-  HSLColor get shade700Hsl;
+  HSLColor get shade700Hsl => HSLColor.fromColor(shade700);
+
+  /// Equivlent to [shade800]
+  HSLColor get shade800Hsl => HSLColor.fromColor(shade800);
 
   /// Dark shade. Equivlent to [shade900]
-  HSLColor get shade900Hsl;
+  HSLColor get shade900Hsl => HSLColor.fromColor(shade900);
 
   // ignore: prefer_const_constructors_in_immutables
   Color2(super.primary, super.swatch, {this.label});
@@ -232,99 +247,95 @@ abstract class Color2 extends MaterialColor {
   }
 
   @override
-  bool operator ==(Object other) {
-    if (other is Color2) {
-      return shade100Hsl == other.shade100Hsl &&
-          shade300Hsl == other.shade300Hsl &&
-          shade500Hsl == other.shade500Hsl &&
-          shade700Hsl == other.shade700Hsl &&
-          shade900Hsl == other.shade900Hsl;
-    }
-    return false;
-  }
-
-  @override
-  int get hashCode {
-    return shade100Hsl.hashCode ^
-        shade300Hsl.hashCode ^
-        shade500Hsl.hashCode ^
-        shade700Hsl.hashCode ^
-        shade900Hsl.hashCode;
-  }
-
-  @override
   String toString() {
     return label == null ? "Color2" : "Color2(\"$label\")";
   }
 }
 
+/// Explictly provided color. Automatically filling any missing shades by linearly interpolating between
+/// the provided shades.
 class ExplictColor2 extends Color2 {
-  @override
-  final HSLColor shade100Hsl;
-  @override
-  final HSLColor shade300Hsl;
-  @override
-  final HSLColor shade500Hsl;
-  @override
-  final HSLColor shade700Hsl;
-  @override
-  final HSLColor shade900Hsl;
-
   factory ExplictColor2({
     required HSLColor shade100,
-    required HSLColor shade300,
-    required HSLColor shade500,
-    required HSLColor shade700,
+    HSLColor? shade200,
+    HSLColor? shade300,
+    HSLColor? shade400,
+    HSLColor? shade500,
+    HSLColor? shade600,
+    HSLColor? shade700,
+    HSLColor? shade800,
     required HSLColor shade900,
     String? label,
   }) {
-    final mediumColor = shade500.toColor();
+    List<HSLColor?> colors = [
+      shade100,
+      shade200,
+      shade300,
+      shade400,
+      shade500,
+      shade600,
+      shade700,
+      shade800,
+      shade900
+    ];
+    HSLColor calculateShade(List<HSLColor?> colors, int index) {
+      assert(colors.first != null &&
+          colors.last != null &&
+          colors.length > 1 &&
+          index != 0 &&
+          index != colors.length - 1 &&
+          colors[index] == null);
+      HSLColor lastColor = colors[index - 1]!;
+      HSLColor? nextColor;
+      int nextColorIndex = 0;
+      for (int i = index + 1; i < colors.length; i++) {
+        final color = colors[i];
+        if (color != null) {
+          nextColor = color;
+          nextColorIndex = i;
+          break;
+        }
+      }
+      double t = 1 / (nextColorIndex - index);
+      return linearlyInterpolate(lastColor, nextColor!, t);
+    }
+
+    for (int index = 0; index < colors.length; index++) {
+      if (colors[index] == null) {
+        colors[index] = calculateShade(colors, index);
+      }
+    }
+    List<HSLColor> colorsC = colors.cast<HSLColor>();
+
+    final medium = colorsC[4].toColor();
     final swatch = {
-      50: linearlyInterpolate(HSLColor.fromColor(Colors.white), shade100, 0.5).toColor(),
+      50: linearlyInterpolate(
+              HSLColor.fromAHSL(shade100.alpha, shade100.hue, shade100.saturation, 1),
+              shade100,
+              0.5)
+          .toColor(),
       100: shade100.toColor(),
-      200: linearlyInterpolate(shade100, shade300, 0.5).toColor(),
-      300: shade300.toColor(),
-      400: linearlyInterpolate(shade300, shade500, 0.5).toColor(),
-      500: mediumColor,
-      600: linearlyInterpolate(shade500, shade700, 0.5).toColor(),
-      700: shade700.toColor(),
-      800: linearlyInterpolate(shade700, shade900, 0.5).toColor(),
+      200: colorsC[1].toColor(),
+      300: colorsC[2].toColor(),
+      400: colorsC[3].toColor(),
+      500: medium,
+      600: colorsC[5].toColor(),
+      700: colorsC[6].toColor(),
+      800: colorsC[7].toColor(),
       900: shade900.toColor()
     };
-    return ExplictColor2._(mediumColor.value, swatch,
-        shade100Hsl: shade100,
-        shade300Hsl: shade300,
-        shade500Hsl: shade500,
-        shade700Hsl: shade700,
-        shade900Hsl: shade900,
-        label: label);
+    return ExplictColor2._(medium.value, swatch, label: label);
   }
 
-  ExplictColor2._(super.primary, super.swatch,
-      {required this.shade100Hsl,
-      required this.shade300Hsl,
-      required this.shade500Hsl,
-      required this.shade700Hsl,
-      required this.shade900Hsl,
-      super.label});
+  ExplictColor2._(super.primary, super.swatch, {super.label});
 }
 
+/// A color defined by a hue and two shades.
 class ShadeColor2 extends Color2 {
   final double hue;
   final SL lightestShade;
   final SL darkestShade;
   final InterpolationFunction interpolate;
-
-  @override
-  final HSLColor shade100Hsl;
-  @override
-  final HSLColor shade300Hsl;
-  @override
-  final HSLColor shade500Hsl;
-  @override
-  final HSLColor shade700Hsl;
-  @override
-  final HSLColor shade900Hsl;
 
   factory ShadeColor2(
       {required double hue,
@@ -351,7 +362,11 @@ class ShadeColor2 extends Color2 {
 
     final shade500 = shade500Hsl.toColor();
     final swatch = {
-      50: interpolate(HSLColor.fromColor(Colors.white), shade100Hsl, 0.5).toColor(),
+      50: interpolate(
+              HSLColor.fromAHSL(shade100Hsl.alpha, shade100Hsl.hue, shade100Hsl.saturation, 1),
+              shade100Hsl,
+              0.5)
+          .toColor(),
       100: shade100Hsl.toColor(),
       200: interpolate(shade100Hsl, shade900Hsl, t(200)).toColor(),
       300: shade300Hsl.toColor(),
@@ -368,12 +383,7 @@ class ShadeColor2 extends Color2 {
         lightestShade: lightestShade,
         darkestShade: darkestShade,
         interpolate: interpolate,
-        label: label,
-        shade100Hsl: shade100Hsl,
-        shade300Hsl: shade300Hsl,
-        shade500Hsl: shade500Hsl,
-        shade700Hsl: shade700Hsl,
-        shade900Hsl: shade900Hsl);
+        label: label);
   }
 
   factory ShadeColor2.greyScale(
@@ -393,11 +403,6 @@ class ShadeColor2 extends Color2 {
       {required this.hue,
       required this.lightestShade,
       required this.darkestShade,
-      required this.shade100Hsl,
-      required this.shade300Hsl,
-      required this.shade500Hsl,
-      required this.shade700Hsl,
-      required this.shade900Hsl,
       this.interpolate = linearlyInterpolate,
       super.label});
 }
