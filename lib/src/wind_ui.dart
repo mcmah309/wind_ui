@@ -553,12 +553,13 @@ extension Color2OnMaterialColor on MaterialColor {
 }
 
 extension HSLColorExtension on HSLColor {
-  /// Increase the brightness of the color by rotating the hue towards the closest max brightness hue.
+  /// Increase the "precieved" brightness (color theory) of the color by rotating the hue towards the closest max brightness hue.
   /// [percent] is a value between 0.0 and 1.0.
+  /// Useful for highlight colors. To get a good visual effect you will likely still need to adjust "saturation" and "lightness".
   /// Based on: pg 135 of "refactor ui" by Adam Watham & Steve Schoger
-  HSLColor increaseBrightnessByRotatingHue(HSLColor color, double percent) {
+  HSLColor increaseBrightness(double percent) {
     assert(percent >= 0 && percent <= 1);
-    double hue = color.hue;
+    double hue = this.hue;
     int closest = _maxsHues.first;
     for (final maxHue in _maxsHues.skip(1)) {
       if ((hue - maxHue).abs() < (hue - closest).abs()) {
@@ -566,15 +567,16 @@ extension HSLColorExtension on HSLColor {
       }
     }
     hue += (closest - hue) * percent;
-    return HSLColor.fromAHSL(color.alpha, hue, color.saturation, color.lightness);
+    return HSLColor.fromAHSL(alpha, hue, saturation, lightness);
   }
 
-  /// Decrease the brightness of the color by rotating the hue towards the closest min brightness hue.
+  /// Decrease the "precieved" brightness (color theory) of the color by rotating the hue towards the closest min brightness hue.
   /// [percent] is a value between 0.0 and 1.0.
+  /// Useful for highlight colors. To get a good visual effect you will likely still need to adjust "saturation" and "lightness".
   /// Based on: pg 135 of "refactor ui" by Adam Watham & Steve Schoger
-  HSLColor decreaseBrightnessByRotatingHue(HSLColor color, double percent) {
+  HSLColor decreaseBrightness(double percent) {
     assert(percent >= 0 && percent <= 1);
-    double hue = color.hue;
+    double hue = this.hue;
     int closest = _minHues.first;
     for (final minHue in _minHues.skip(1)) {
       if ((hue - minHue).abs() < (hue - closest).abs()) {
@@ -582,7 +584,7 @@ extension HSLColorExtension on HSLColor {
       }
     }
     hue += (closest - hue) * percent;
-    return HSLColor.fromAHSL(color.alpha, hue, color.saturation, color.lightness);
+    return HSLColor.fromAHSL(alpha, hue, saturation, lightness);
   }
 }
 

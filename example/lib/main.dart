@@ -235,6 +235,23 @@ class Color2Test extends StatelessWidget {
                     shade700: HSLColor.fromColor(Colors.purple),
                     shade900: HSLColor.fromColor(Colors.orange)),
                 "Explicit: Three very different colors - blue 100 to purple 700 to orange 900"),
+            test(
+                Color2.shade(
+                    hue: 189,
+                    lightestShade: SL(saturation: 1, lightness: 0.61),
+                    darkestShade: SL(saturation: 0.64, lightness: 0.12)),
+                "Shade: Same type of teal"),
+            test(Color2.fullLightScale(57), "Yellow full light scale"),
+            test(
+                Color2.explict(
+                    shade100: const HSLColor.fromAHSL(1, 30, 1, 0.5),
+                    shade900: const HSLColor.fromAHSL(1, 30, 1, 0.5).decreaseBrightness(1)),
+                "Hue Rotation - Brightness Decrease"),
+                test(
+                Color2.explict(
+                    shade100: const HSLColor.fromAHSL(1, 30, 1, 0.5),
+                    shade900: const HSLColor.fromAHSL(1, 30, 1, 0.5).increaseBrightness(1)),
+                "Hue Rotation - Brightness Increase")
           ],
         ),
       ),
