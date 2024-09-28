@@ -209,6 +209,7 @@ abstract class Color2 extends MaterialColor {
   // ignore: prefer_const_constructors_in_immutables
   Color2(super.primary, super.swatch, {this.label});
 
+  /// A color defined by  interpolating by the provided shades.
   factory Color2.explict(
       {required HSLColor shade100,
       HSLColor? shade200,
@@ -221,10 +222,11 @@ abstract class Color2 extends MaterialColor {
       required HSLColor shade900,
       String? label}) = ExplictColor2;
 
+  /// A color defined by a hue interpolated between two shades.
   factory Color2.shade(
       {required double hue,
-      required SL lightestShade,
-      required SL darkestShade,
+      SL lightestShade = const SL(saturation: 1, lightness: 1),
+      SL darkestShade = const SL(saturation: 1, lightness: 0),
       InterpolationFunction interpolate = linearlyInterpolate,
       String? label}) {
     return ShadeColor2(
@@ -235,10 +237,30 @@ abstract class Color2 extends MaterialColor {
         label: label);
   }
 
+  /// A grey scale color defined by interpolating between two lightness values in the gray scale.
+  factory Color2.greyScale(
+      {required double startLightness,
+      required double endLightness,
+      InterpolationFunction interpolate = linearlyInterpolate,
+      String? label}) {
+    return ShadeColor2.greyScale(
+        startLightness: startLightness,
+        endLightness: endLightness,
+        interpolate: interpolate,
+        label: label);
+  }
+
+  /// A color defined by interpolation the entire lightness scale.
+  factory Color2.fullLightScale(double hue, {double saturation = 1}) {
+    return ShadeColor2.fullLightScale(hue, saturation: saturation);
+  }
+
   factory Color2.material(MaterialColor material) {
     return material.toColor2();
   }
 
+  /// Turns a [Color] into a [Color2]. All shades will be the same color. Prefer [fullLightScale],[shade], or [explicit] if you want the color
+  /// to be different shades.
   factory Color2.color(Color color) {
     final material = MaterialColor2(color.value, {
       50: color,
@@ -255,11 +277,18 @@ abstract class Color2 extends MaterialColor {
     return Color2.material(material);
   }
 
-  /// Convert this color to a [MaterialAccentColor]
-  MaterialAccentColor toMaterialAccentColor() {
-    final swatch = {100: shade100, 200: shade200, 400: shade300, 700: shade700};
+  /// Convert this color to a [MaterialAccentColor].
+  MaterialAccentColor toMaterialAccentColor(
+      {int shade100 = 100, int shade200 = 200, int shade400 = 400, int shade700 = 700}) {
+    final twoHundred = this[shade200]!;
+    final swatch = {
+      100: this[shade100]!,
+      200: twoHundred,
+      400: this[shade400]!,
+      700: this[shade700]!
+    };
 
-    return MaterialAccentColor(shade200.value, swatch);
+    return MaterialAccentColor(twoHundred.value, swatch);
   }
 
   @override
@@ -417,6 +446,13 @@ class ShadeColor2 extends Color2 {
         label: label);
   }
 
+  factory ShadeColor2.fullLightScale(double hue, {double saturation = 1}) {
+    return ShadeColor2(
+        hue: hue,
+        lightestShade: SL(saturation: saturation, lightness: 1),
+        darkestShade: SL(saturation: saturation, lightness: 0));
+  }
+
   ShadeColor2._(super.primary, super.swatch,
       {required this.hue,
       required this.lightestShade,
@@ -447,7 +483,7 @@ class SL {
   final double saturation;
   final double lightness;
 
-  SL({required this.saturation, required this.lightness});
+  const SL({required this.saturation, required this.lightness});
 }
 
 /// A function that interpolates between two [HSLColor]s. Where `t` is a value between 0.0 and 1.0.
