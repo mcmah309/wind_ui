@@ -13,15 +13,21 @@ abstract mixin class Secondary {
 
 /// Backgrounds and large, low-emphasis areas of the screen.
 abstract mixin class Surface {
+  /// Backgrounds and large, low-emphasis areas of the screen. Usually [shade100] is somehting akin to white.
   Color2 get surface => Colors2.greyNeutral;
 }
 
 /// The colors used to communicate basic different types of information.
 abstract mixin class CommunicationAccents {
+  /// The color used for primary actions that do not have a neutral connotation
+  /// e.g. "go to page" is not positive or negative. This can be the primary or secondary color,
+  /// but differnet shades will likely be used than the usual uses of primary or secondary.
+  Color2 get action => Colors2.greyNeutral;
+
   /// Attention hightlight like "new feature".
   Color2 get focalPoint => Colors2.greyNeutral;
 
-  /// A destructive actoin like "delete".
+  /// A destructive action like "delete".
   Color2 get destructive => Colors2.greyNeutral;
 
   /// A warning like "are you sure you want to do this?".
@@ -31,8 +37,9 @@ abstract mixin class CommunicationAccents {
   Color2 get positive => Colors2.greyNeutral;
 }
 
-/// Neutral accent color used for low-emphasis areas of the screen.
+/// Neutral accent color used for low-emphasis areas of the screen. Often shades of grey
 abstract mixin class NeutralAccent {
+  /// Neutral accent color used for low-emphasis areas of the screen. Often shades of grey
   Color2 get neutral => Colors2.greyNeutral;
 }
 
@@ -41,13 +48,28 @@ abstract mixin class TextSelectionAccent {
   Color2 get textSelectionCursor => Colors2.greyNeutral;
 }
 
-/// The radious on the corners of objects.
-///
-/// A small border radius is pretty neutral, and doesn’t really communicate
-/// much of a personality on its own, while a large border radius starts to feel more playful,
-/// and no border radius at all feels a lot more serious or formal.
-abstract mixin class BorderRadius {
+/// The default decorations. Any variations from the default should probably be made relative to
+/// the default e.g.
+/// ```dart
+///  final differentShadow = shadow + x;
+/// ```
+// Dev Note: Things like "border color" are not included since they are usally dependent on the colors
+// currently being worked with, while something like "shadow color" is usually consistant.
+abstract mixin class Decoration {
+  Color2 get border => Colors2.greyNeutral;
+
+  /// The radious on the corners of objects.
+  ///
+  /// A small border radius is pretty neutral, and doesn’t really communicate
+  /// much of a personality on its own, while a large border radius starts to feel more playful,
+  /// and no border radius at all feels a lot more serious or formal.
   double get borderRadius => 0;
+
+  /// The shadow color.
+  Color2 get shadow => Colors2.greyScaleDark;
+
+  /// The radius of the shadow. aka elevation
+  double get shadowRadius => 3;
 }
 
 abstract mixin class Brightness {
@@ -81,6 +103,9 @@ abstract mixin class Font {
 
   /// Font family
   TextTheme get fontFamily => Typography.blackCupertino;
+
+  Color2 get textOnDark => Colors2.greyScaleLight;
+  Color2 get textOnLight => Colors2.greyScaleDark;
 }
 
 abstract class FullTheme extends BasicMaterialTheme
@@ -91,12 +116,15 @@ abstract class FullTheme extends BasicMaterialTheme
         CommunicationAccents,
         NeutralAccent,
         TextSelectionAccent,
-        BorderRadius,
+        Decoration,
         Brightness,
         Font {
   @override
   ThemeData createMaterialThemeData() {
-    return super.createMaterialThemeData().copyWith(
+    final themeData = super.createMaterialThemeData();
+    return themeData.copyWith(
+        colorScheme: themeData.colorScheme.copyWith(shadow: shadow),
+        shadowColor: shadow,
         textSelectionTheme: TextSelectionThemeData(
             selectionColor: textSelection,
             selectionHandleColor: textSelectionCursor,
@@ -128,30 +156,6 @@ abstract class BasicMaterialTheme
 
     return ThemeData.from(colorScheme: colorScheme, textTheme: fontFamily, useMaterial3: true);
   }
-}
-
-class AppTheme2 implements Primary, CommunicationAccents {
-  @override
-  final Color2 primary;
-
-  /// A
-  late final MaterialColor neutral;
-
-  @override
-  final Color2 focalPoint;
-  @override
-  final Color2 destructive;
-  @override
-  final Color2 warning;
-  @override
-  final Color2 positive;
-
-  AppTheme2(
-      {required this.primary,
-      required this.focalPoint,
-      required this.destructive,
-      required this.warning,
-      required this.positive});
 }
 
 /// A redesigned version of the [MaterialColor] and [MaterialAccentColor] classes.
@@ -202,6 +206,22 @@ abstract class Color2 extends MaterialColor {
 
   factory Color2.material(MaterialColor material) {
     return material.toColor2();
+  }
+
+  factory Color2.color(Color color) {
+    final material = MaterialColor2(color.value, {
+      50: color,
+      100: color,
+      200: color,
+      300: color,
+      400: color,
+      500: color,
+      600: color,
+      700: color,
+      800: color,
+      900: color
+    });
+    return Color2.material(material);
   }
 
   /// Convert this color to a [MaterialAccentColor]
@@ -296,15 +316,15 @@ class ShadeColor2 extends Color2 {
   final InterpolationFunction interpolate;
 
   @override
-  late final HSLColor shade100Hsl;
+  final HSLColor shade100Hsl;
   @override
-  late final HSLColor shade300Hsl;
+  final HSLColor shade300Hsl;
   @override
-  late final HSLColor shade500Hsl;
+  final HSLColor shade500Hsl;
   @override
-  late final HSLColor shade700Hsl;
+  final HSLColor shade700Hsl;
   @override
-  late final HSLColor shade900Hsl;
+  final HSLColor shade900Hsl;
 
   factory ShadeColor2(
       {required double hue,
@@ -312,12 +332,13 @@ class ShadeColor2 extends Color2 {
       required SL darkestShade,
       InterpolationFunction interpolate = linearlyInterpolate,
       String? label}) {
-    final light = HSLColor.fromAHSL(1, hue, lightestShade.saturation, lightestShade.lightness);
-    final dark = HSLColor.fromAHSL(1, hue, darkestShade.saturation, darkestShade.lightness);
+    final shade100Hsl =
+        HSLColor.fromAHSL(1, hue, lightestShade.saturation, lightestShade.lightness);
+    final shade900Hsl = HSLColor.fromAHSL(1, hue, darkestShade.saturation, darkestShade.lightness);
 
-    final mediumLight = interpolate(light, dark, 0.25);
-    final medium = interpolate(light, dark, 0.5);
-    final mediumDark = interpolate(light, dark, 0.75);
+    final shade300Hsl = interpolate(shade100Hsl, shade900Hsl, 0.25);
+    final shade500Hsl = interpolate(shade100Hsl, shade900Hsl, 0.5);
+    final shade700Hsl = interpolate(shade100Hsl, shade900Hsl, 0.75);
 
     const end = 900;
     const start = 100;
@@ -328,24 +349,42 @@ class ShadeColor2 extends Color2 {
 
     assert(t(300) == 0.25 && t(500) == 0.5 && t(700) == 0.75, "You did your math wrong buddy.");
 
-    final mediumColor = medium.toColor();
+    final shade500 = shade500Hsl.toColor();
     final swatch = {
-      50: interpolate(HSLColor.fromColor(Colors.white), light, 0.5).toColor(),
-      100: light.toColor(),
-      200: interpolate(light, dark, t(200)).toColor(),
-      300: mediumLight.toColor(),
-      400: interpolate(light, dark, t(400)).toColor(),
-      500: mediumColor,
-      600: interpolate(light, dark, t(600)).toColor(),
-      700: mediumDark.toColor(),
-      800: interpolate(light, dark, t(800)).toColor(),
-      900: dark.toColor()
+      50: interpolate(HSLColor.fromColor(Colors.white), shade100Hsl, 0.5).toColor(),
+      100: shade100Hsl.toColor(),
+      200: interpolate(shade100Hsl, shade900Hsl, t(200)).toColor(),
+      300: shade300Hsl.toColor(),
+      400: interpolate(shade100Hsl, shade900Hsl, t(400)).toColor(),
+      500: shade500,
+      600: interpolate(shade100Hsl, shade900Hsl, t(600)).toColor(),
+      700: shade700Hsl.toColor(),
+      800: interpolate(shade100Hsl, shade900Hsl, t(800)).toColor(),
+      900: shade900Hsl.toColor()
     };
 
-    return ShadeColor2._(mediumColor.value, swatch,
+    return ShadeColor2._(shade500.value, swatch,
         hue: hue,
         lightestShade: lightestShade,
         darkestShade: darkestShade,
+        interpolate: interpolate,
+        label: label,
+        shade100Hsl: shade100Hsl,
+        shade300Hsl: shade300Hsl,
+        shade500Hsl: shade500Hsl,
+        shade700Hsl: shade700Hsl,
+        shade900Hsl: shade900Hsl);
+  }
+
+  factory ShadeColor2.greyScale(
+      {required double startLightness,
+      required double endLightness,
+      InterpolationFunction interpolate = linearlyInterpolate,
+      String? label}) {
+    return ShadeColor2(
+        hue: 0,
+        lightestShade: SL(saturation: 0, lightness: startLightness),
+        darkestShade: SL(saturation: 0, lightness: endLightness),
         interpolate: interpolate,
         label: label);
   }
@@ -354,6 +393,11 @@ class ShadeColor2 extends Color2 {
       {required this.hue,
       required this.lightestShade,
       required this.darkestShade,
+      required this.shade100Hsl,
+      required this.shade300Hsl,
+      required this.shade500Hsl,
+      required this.shade700Hsl,
+      required this.shade900Hsl,
       this.interpolate = linearlyInterpolate,
       super.label});
 }
@@ -412,6 +456,9 @@ class Colors2 {
       shade500: const HSLColor.fromAHSL(1, 39, 0.12, 0.58),
       shade700: const HSLColor.fromAHSL(1, 40, 0.12, 0.43),
       shade900: const HSLColor.fromAHSL(1, 41, 0.15, 0.28));
+
+  static final Color2 greyScaleLight = ShadeColor2.greyScale(startLightness: 0, endLightness: 0.5);
+  static final Color2 greyScaleDark = ShadeColor2.greyScale(startLightness: 0.5, endLightness: 1);
 }
 
 class FontSize extends TextStyle {
