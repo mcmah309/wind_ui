@@ -86,14 +86,14 @@ abstract mixin class Brightness {
 }
 
 abstract mixin class Font {
-  FontSize get textXs => const FontSize(fontSize: 12, height: 1 + 1/3);
-  FontSize get textSm => const FontSize(fontSize: 14, height: 1 + 3/7);
+  FontSize get textXs => const FontSize(fontSize: 12, height: 1 + 1 / 3);
+  FontSize get textSm => const FontSize(fontSize: 14, height: 1 + 3 / 7);
   FontSize get textBase => const FontSize(fontSize: 16, height: 1.25);
-  FontSize get textLg => const FontSize(fontSize: 18, height: 1 + 5/9);
+  FontSize get textLg => const FontSize(fontSize: 18, height: 1 + 5 / 9);
   FontSize get textXl => const FontSize(fontSize: 20, height: 1.4);
-  FontSize get text2Xl => const FontSize(fontSize: 24, height: 1 + 1/3);
+  FontSize get text2Xl => const FontSize(fontSize: 24, height: 1 + 1 / 3);
   FontSize get text3Xl => const FontSize(fontSize: 30, height: 1.2);
-  FontSize get text4Xl => const FontSize(fontSize: 36, height: 1 + 1/9);
+  FontSize get text4Xl => const FontSize(fontSize: 36, height: 1 + 1 / 9);
   FontSize get text5Xl => const FontSize(fontSize: 48);
   FontSize get text6Xl => const FontSize(fontSize: 60);
   FontSize get text7Xl => const FontSize(fontSize: 72);
@@ -115,6 +115,7 @@ abstract mixin class Font {
 
   /// For on dark backgrounds
   Color2 get textLight => Colors2.greyScaleLight;
+
   /// For on light backgrounds
   Color2 get textDark => Colors2.greyScaleDark;
 }
@@ -210,9 +211,13 @@ abstract class Color2 extends MaterialColor {
 
   factory Color2.explict(
       {required HSLColor shade100,
-      required HSLColor shade300,
-      required HSLColor shade500,
-      required HSLColor shade700,
+      HSLColor? shade200,
+      HSLColor? shade300,
+      HSLColor? shade400,
+      HSLColor? shade500,
+      HSLColor? shade600,
+      HSLColor? shade700,
+      HSLColor? shade800,
       required HSLColor shade900,
       String? label}) = ExplictColor2;
 
@@ -477,8 +482,12 @@ class Colors2 {
 
   /// The dark side of the grey scale
   static final Color2 greyScaleDark = ShadeColor2.greyScale(startLightness: 0.5, endLightness: 0);
+
   /// The light side of the grey scale
   static final Color2 greyScaleLight = ShadeColor2.greyScale(startLightness: 1, endLightness: 0.5);
+
+  /// The entire grey scale
+  static final Color2 greyScale = ShadeColor2.greyScale(startLightness: 1, endLightness: 0);
 }
 
 class FontSize extends TextStyle {
