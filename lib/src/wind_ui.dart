@@ -1,19 +1,23 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/material.dart' as material;
+import 'package:meta/meta.dart';
 
 /// The primary color used in the ui.
 abstract mixin class Primary {
+  @mustBeOverridden
   Color2 get primary => Colors2.greyNeutral;
 }
 
 /// The secondary color used in the ui.
 abstract mixin class Secondary {
+  @mustBeOverridden
   Color2 get secondary => Colors2.greyNeutral;
 }
 
 /// Backgrounds and large, low-emphasis areas of the screen.
 abstract mixin class Surface {
   /// Backgrounds and large, low-emphasis areas of the screen. Usually [shade100] is somehting akin to white.
+  @mustBeOverridden
   Color2 get surface => Colors2.greyNeutral;
 }
 
@@ -22,18 +26,23 @@ abstract mixin class CommunicationAccents {
   /// The color used for primary actions that do not have a neutral connotation
   /// e.g. "go to page" is not positive or negative. This can be the primary or secondary color,
   /// but differnet shades will likely be used than the usual uses of primary or secondary.
+  @mustBeOverridden
   Color2 get action => Colors2.greyNeutral;
 
   /// Attention hightlight like "new feature".
+  @mustBeOverridden
   Color2 get focalPoint => Colors2.greyNeutral;
 
   /// A destructive action like "delete".
+  @mustBeOverridden
   Color2 get destructive => Colors2.greyNeutral;
 
   /// A warning like "are you sure you want to do this?".
+  @mustBeOverridden
   Color2 get warning => Colors2.greyNeutral;
 
   /// A positive action like "saved".
+  @mustBeOverridden
   Color2 get positive => Colors2.greyNeutral;
 }
 
@@ -44,8 +53,10 @@ abstract mixin class NeutralAccent {
 }
 
 abstract mixin class TextSelectionAccent {
-  Color2 get textSelection => Colors2.greyNeutral;
-  Color2 get textSelectionCursor => Colors2.greyNeutral;
+  @mustBeOverridden
+  Color2 get textSelection => Colors2.greyCool;
+  @mustBeOverridden
+  Color2 get textSelectionCursor => Colors2.greyCool;
 }
 
 /// The default decorations. Any variations from the default should probably be made relative to
@@ -56,8 +67,6 @@ abstract mixin class TextSelectionAccent {
 // Dev Note: Things like "border color" are not included since they are usally dependent on the colors
 // currently being worked with, while something like "shadow color" is usually consistant.
 abstract mixin class Decoration {
-  Color2 get border => Colors2.greyNeutral;
-
   /// The radious on the corners of objects.
   ///
   /// A small border radius is pretty neutral, and doesn’t really communicate
@@ -287,7 +296,8 @@ class ExplictColor2 extends Color2 {
           index != 0 &&
           index != colors.length - 1 &&
           colors[index] == null);
-      HSLColor lastColor = colors[index - 1]!;
+      final int lastIndex = index - 1;
+      HSLColor lastColor = colors[lastIndex]!;
       HSLColor? nextColor;
       int nextColorIndex = 0;
       for (int i = index + 1; i < colors.length; i++) {
@@ -298,7 +308,8 @@ class ExplictColor2 extends Color2 {
           break;
         }
       }
-      double t = 1 / (nextColorIndex - index);
+      double t = 1 / (nextColorIndex - lastIndex);
+      assert(t < 1 && t > 0);
       return linearlyInterpolate(lastColor, nextColor!, t);
     }
 
@@ -464,8 +475,10 @@ class Colors2 {
       shade700: const HSLColor.fromAHSL(1, 40, 0.12, 0.43),
       shade900: const HSLColor.fromAHSL(1, 41, 0.15, 0.28));
 
-  static final Color2 greyScaleLight = ShadeColor2.greyScale(startLightness: 0, endLightness: 0.5);
-  static final Color2 greyScaleDark = ShadeColor2.greyScale(startLightness: 0.5, endLightness: 1);
+  /// The dark side of the grey scale
+  static final Color2 greyScaleDark = ShadeColor2.greyScale(startLightness: 0.5, endLightness: 0);
+  /// The light side of the grey scale
+  static final Color2 greyScaleLight = ShadeColor2.greyScale(startLightness: 1, endLightness: 0.5);
 }
 
 class FontSize extends TextStyle {
