@@ -221,6 +221,8 @@ class Color2Test extends StatelessWidget {
             test(Colors2.greyCool, "Grey Cool"),
             test(Colors2.greyWarm, "Grey Warm"),
             test(Colors2.greyScale, "Grey Scale"),
+            test(ShadeColor2.greyScale(startLightness: 1, endLightness: 0, curve: Curves.easeInOutQuint), "Grey Scale Parabolic Curve"),
+            test(ShadeColor2.greyScale(startLightness: 1, endLightness: 0, curve: Curves.slowMiddle), "Grey Scale Slow Middle Curve"),
             test(Colors2.greyScaleDark, "Grey Scale Dark"),
             test(Colors2.greyScaleLight, "Grey Scale Light"),
             test(Color2.material(Colors.red), "A material color"),
@@ -247,11 +249,11 @@ class Color2Test extends StatelessWidget {
                     shade100: const HSLColor.fromAHSL(1, 30, 1, 0.5),
                     shade900: const HSLColor.fromAHSL(1, 30, 1, 0.5).decreaseBrightness(1)),
                 "Hue Rotation - Brightness Decrease"),
-                test(
+            test(
                 Color2.explict(
                     shade100: const HSLColor.fromAHSL(1, 30, 1, 0.5),
                     shade900: const HSLColor.fromAHSL(1, 30, 1, 0.5).increaseBrightness(1)),
-                "Hue Rotation - Brightness Increase")
+                "Hue Rotation - Brightness Increase"),
           ],
         ),
       ),

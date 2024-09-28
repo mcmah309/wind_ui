@@ -222,18 +222,18 @@ abstract class Color2 extends MaterialColor {
       required HSLColor shade900,
       String? label}) = ExplictColor2;
 
-  /// A color defined by a hue interpolated between two shades.
+  /// A color defined by a hue curved between two shades.
   factory Color2.shade(
       {required double hue,
       SL lightestShade = const SL(saturation: 1, lightness: 1),
       SL darkestShade = const SL(saturation: 1, lightness: 0),
-      InterpolationFunction interpolate = linearlyInterpolate,
+      Curve curve = Curves.linear,
       String? label}) {
     return ShadeColor2(
         hue: hue,
         lightestShade: lightestShade,
         darkestShade: darkestShade,
-        interpolate: interpolate,
+        curve: curve,
         label: label);
   }
 
@@ -241,12 +241,12 @@ abstract class Color2 extends MaterialColor {
   factory Color2.greyScale(
       {required double startLightness,
       required double endLightness,
-      InterpolationFunction interpolate = linearlyInterpolate,
+      Curve curve = Curves.linear,
       String? label}) {
     return ShadeColor2.greyScale(
         startLightness: startLightness,
         endLightness: endLightness,
-        interpolate: interpolate,
+        curve: curve,
         label: label);
   }
 
@@ -344,7 +344,7 @@ class ExplictColor2 extends Color2 {
       }
       double t = 1 / (nextColorIndex - lastIndex);
       assert(t < 1 && t > 0);
-      return linearlyInterpolate(lastColor, nextColor!, t);
+      return _interpolate(lastColor, nextColor!, t);
     }
 
     for (int index = 0; index < colors.length; index++) {
@@ -356,7 +356,7 @@ class ExplictColor2 extends Color2 {
 
     final medium = colorsC[4].toColor();
     final swatch = {
-      50: linearlyInterpolate(
+      50: _interpolate(
               HSLColor.fromAHSL(shade100.alpha, shade100.hue, shade100.saturation, 1),
               shade100,
               0.5)
@@ -382,21 +382,23 @@ class ShadeColor2 extends Color2 {
   final double hue;
   final SL lightestShade;
   final SL darkestShade;
-  final InterpolationFunction interpolate;
+  /// A function that curves between two [HSLColor]s. Given linear position `t` between 0.0 and 1.0 (The two shades),
+  /// return the new `t`. e.g. [Curves.linear] return an unmodified `t`.
+  final Curve curve;
 
   factory ShadeColor2(
       {required double hue,
       required SL lightestShade,
       required SL darkestShade,
-      InterpolationFunction interpolate = linearlyInterpolate,
+      Curve curve = Curves.linear,
       String? label}) {
     final shade100Hsl =
         HSLColor.fromAHSL(1, hue, lightestShade.saturation, lightestShade.lightness);
     final shade900Hsl = HSLColor.fromAHSL(1, hue, darkestShade.saturation, darkestShade.lightness);
 
-    final shade300Hsl = interpolate(shade100Hsl, shade900Hsl, 0.25);
-    final shade500Hsl = interpolate(shade100Hsl, shade900Hsl, 0.5);
-    final shade700Hsl = interpolate(shade100Hsl, shade900Hsl, 0.75);
+    final shade300Hsl = _interpolate(shade100Hsl, shade900Hsl, curve.transform(0.25));
+    final shade500Hsl = _interpolate(shade100Hsl, shade900Hsl, curve.transform(0.5));
+    final shade700Hsl = _interpolate(shade100Hsl, shade900Hsl, curve.transform(0.75));
 
     const end = 900;
     const start = 100;
@@ -409,19 +411,19 @@ class ShadeColor2 extends Color2 {
 
     final shade500 = shade500Hsl.toColor();
     final swatch = {
-      50: interpolate(
+      50: _interpolate(
               HSLColor.fromAHSL(shade100Hsl.alpha, shade100Hsl.hue, shade100Hsl.saturation, 1),
               shade100Hsl,
               0.5)
           .toColor(),
       100: shade100Hsl.toColor(),
-      200: interpolate(shade100Hsl, shade900Hsl, t(200)).toColor(),
+      200: _interpolate(shade100Hsl, shade900Hsl, curve.transform(t(200))).toColor(),
       300: shade300Hsl.toColor(),
-      400: interpolate(shade100Hsl, shade900Hsl, t(400)).toColor(),
+      400: _interpolate(shade100Hsl, shade900Hsl, curve.transform(t(400))).toColor(),
       500: shade500,
-      600: interpolate(shade100Hsl, shade900Hsl, t(600)).toColor(),
+      600: _interpolate(shade100Hsl, shade900Hsl, curve.transform(t(600))).toColor(),
       700: shade700Hsl.toColor(),
-      800: interpolate(shade100Hsl, shade900Hsl, t(800)).toColor(),
+      800: _interpolate(shade100Hsl, shade900Hsl, curve.transform(t(800))).toColor(),
       900: shade900Hsl.toColor()
     };
 
@@ -429,20 +431,20 @@ class ShadeColor2 extends Color2 {
         hue: hue,
         lightestShade: lightestShade,
         darkestShade: darkestShade,
-        interpolate: interpolate,
+        curve: curve,
         label: label);
   }
 
   factory ShadeColor2.greyScale(
       {required double startLightness,
       required double endLightness,
-      InterpolationFunction interpolate = linearlyInterpolate,
+      Curve curve = Curves.linear,
       String? label}) {
     return ShadeColor2(
         hue: 0,
         lightestShade: SL(saturation: 0, lightness: startLightness),
         darkestShade: SL(saturation: 0, lightness: endLightness),
-        interpolate: interpolate,
+        curve: curve,
         label: label);
   }
 
@@ -457,23 +459,12 @@ class ShadeColor2 extends Color2 {
       {required this.hue,
       required this.lightestShade,
       required this.darkestShade,
-      this.interpolate = linearlyInterpolate,
+      this.curve = Curves.linear,
       super.label});
 }
 
 class MaterialColor2 extends Color2 {
   MaterialColor2(super.primary, super.swatch, {super.label});
-
-  @override
-  HSLColor get shade100Hsl => HSLColor.fromColor(shade100);
-  @override
-  HSLColor get shade300Hsl => HSLColor.fromColor(shade300);
-  @override
-  HSLColor get shade500Hsl => HSLColor.fromColor(shade500);
-  @override
-  HSLColor get shade700Hsl => HSLColor.fromColor(shade700);
-  @override
-  HSLColor get shade900Hsl => HSLColor.fromColor(shade900);
 }
 
 //************************************************************************//
@@ -486,11 +477,7 @@ class SL {
   const SL({required this.saturation, required this.lightness});
 }
 
-/// A function that interpolates between two [HSLColor]s. Where `t` is a value between 0.0 and 1.0.
-/// 0.0 means the color is `from`, 1.0 means the color is `to`.
-typedef InterpolationFunction = HSLColor Function(HSLColor from, HSLColor to, double t);
-
-HSLColor linearlyInterpolate(HSLColor from, HSLColor to, double t) {
+HSLColor _interpolate(HSLColor from, HSLColor to, double t) {
   return HSLColor.lerp(from, to, t)!;
 }
 
