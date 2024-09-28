@@ -220,8 +220,21 @@ class Color2Test extends StatelessWidget {
             test(Colors2.greyNeutral, "Grey Neutral"),
             test(Colors2.greyCool, "Grey Cool"),
             test(Colors2.greyWarm, "Grey Warm"),
+            test(Colors2.greyScale, "Grey Scale"),
             test(Colors2.greyScaleDark, "Grey Scale Dark"),
             test(Colors2.greyScaleLight, "Grey Scale Light"),
+            test(Color2.material(Colors.red), "A material color"),
+            test(
+                Color2.explict(
+                    shade100: HSLColor.fromColor(Colors.blue),
+                    shade900: HSLColor.fromColor(Colors.orange)),
+                "Explicit: Two very different colors - blue to orange"),
+            test(
+                Color2.explict(
+                    shade100: HSLColor.fromColor(Colors.blue),
+                    shade700: HSLColor.fromColor(Colors.purple),
+                    shade900: HSLColor.fromColor(Colors.orange)),
+                "Explicit: Three very different colors - blue 100 to purple 700 to orange 900"),
           ],
         ),
       ),
@@ -230,8 +243,10 @@ class Color2Test extends StatelessWidget {
 
   Widget test(Color2 color, String label) {
     return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(label),
+        const SizedBox(height: 5),
         Row(
           children: [
             Column(
@@ -362,7 +377,8 @@ class Color2Test extends StatelessWidget {
               ],
             ),
           ],
-        )
+        ),
+        const SizedBox(height: 20),
       ],
     );
   }
