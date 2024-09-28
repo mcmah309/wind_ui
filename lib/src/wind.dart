@@ -104,8 +104,10 @@ abstract mixin class Font {
   /// Font family
   TextTheme get fontFamily => Typography.blackCupertino;
 
-  Color2 get textOnDark => Colors2.greyScaleLight;
-  Color2 get textOnLight => Colors2.greyScaleDark;
+  /// For on dark backgrounds
+  Color2 get textLight => Colors2.greyScaleLight;
+  /// For on light backgrounds
+  Color2 get textDark => Colors2.greyScaleDark;
 }
 
 abstract class FullTheme extends BasicMaterialTheme
