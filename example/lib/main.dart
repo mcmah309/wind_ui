@@ -261,10 +261,11 @@ class Color2Test extends StatelessWidget {
             test(
                 Color2.shade(
                     hue: 189,
-                    lightestShade: SL(saturation: 1, lightness: 0.61),
-                    darkestShade: SL(saturation: 0.64, lightness: 0.12)),
+                    lightestShade: const SL(saturation: 1, lightness: 0.61),
+                    darkestShade: const SL(saturation: 0.64, lightness: 0.12)),
                 "Shade: Same type of teal"),
-            test(Color2.fullLightScale(57), "Yellow full light scale"),
+            test(Color2.fullLightScale(57), "Yellow full lightness scale"),
+            test(Color2.fullSaturationScale(57), "Yellow full saturation scale"),
             test(
                 Color2.explict(
                     shade100: const HSLColor.fromAHSL(1, 30, 1, 0.5),

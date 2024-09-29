@@ -446,7 +446,17 @@ class Color2 extends MaterialColor {
     return Color2.shade(
         hue: hue,
         lightestShade: SL(saturation: saturation, lightness: 1),
-        darkestShade: SL(saturation: saturation, lightness: 0));
+        darkestShade: SL(saturation: saturation, lightness: 0),
+        label: label);
+  }
+
+  /// A color defined by interpolation the entire lightness scale.
+  factory Color2.fullSaturationScale(double hue, {double lightness = 0.5, String? label}) {
+    return Color2.shade(
+        hue: hue,
+        lightestShade: SL(saturation: 0, lightness: lightness),
+        darkestShade: SL(saturation: 1, lightness: lightness),
+        label: label);
   }
 
   factory Color2.material(MaterialColor material, {String? label}) {
