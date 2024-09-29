@@ -225,8 +225,8 @@ class Color2Test extends StatelessWidget {
                 ShadeColor2.greyScale(
                     startLightness: 1,
                     endLightness: 0,
-                    lightnessCurve: Curves.easeInOutQuint,
-                    saturationCurve: Curves.easeInOutQuint),
+                    lightnessCurve: Curves.easeInOutCubic,
+                    saturationCurve: Curves.easeInOutCubic),
                 "Grey Scale Parabolic Curve"),
             test(
                 ShadeColor2.greyScale(

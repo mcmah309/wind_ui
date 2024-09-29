@@ -229,9 +229,9 @@ abstract class Color2 extends MaterialColor {
       {required double hue,
       SL lightestShade = const SL(saturation: 1, lightness: 1),
       SL darkestShade = const SL(saturation: 1, lightness: 0),
-      Curve alphaCurve = Curves.linear,
-      Curve saturationCurve = Curves.linear,
-      Curve lightnessCurve = Curves.linear,
+      ParametricCurve<double> alphaCurve = Curves.linear,
+      ParametricCurve<double> saturationCurve = Curves.linear,
+      ParametricCurve<double> lightnessCurve = Curves.linear,
       String? label}) {
     return ShadeColor2(
         hue: hue,
@@ -247,9 +247,9 @@ abstract class Color2 extends MaterialColor {
   factory Color2.greyScale(
       {required double startLightness,
       required double endLightness,
-      Curve alphaCurve = Curves.linear,
-      Curve saturationCurve = Curves.linear,
-      Curve lightnessCurve = Curves.linear,
+      ParametricCurve<double> alphaCurve = Curves.linear,
+      ParametricCurve<double> saturationCurve = Curves.linear,
+      ParametricCurve<double> lightnessCurve = Curves.linear,
       String? label}) {
     return ShadeColor2.greyScale(
         startLightness: startLightness,
@@ -391,28 +391,33 @@ class ExplictColor2 extends Color2 {
   ExplictColor2._(super.primary, super.swatch, {super.label});
 }
 
-/// A color defined by a hue and two shades.
+/// A color palet defined by transitioning between two shades of a hue.
+/// 
+/// For Curves:
+/// Given linear position `t` between 0.0 and 1.0 (The two shades),
+/// return the new `t`. e.g. [Curves.linear] return an unmodified `t`.
+/// Other useful curves:
+/// - [Curves.easeInOutCubic] : Slow transition on the ends, Fast in the middle
+/// - [Curves.slowMiddle] : Fast on the ends, Slow transition for middle
+/// - [Curves.easeInCubic] : Slow at start, Fast at end
+/// - [Curves.easeOutCubic] : Fast at start, Slow at end
+/// All curves: https://api.flutter.dev/flutter/animation/Curves-class.html
+/// Tip:
+/// If you don’t want the lighter and darker shades of a given
+/// color to look washed out, you need to increase the saturation as the
+/// lightness gets further away from 50%.
 class ShadeColor2 extends Color2 {
   final double hue;
   final SL lightestShade;
   final SL darkestShade;
 
-  /// A function that curves between two [HSLColor]s. Given linear position `t` between 0.0 and 1.0 (The two shades),
-  /// return the new `t`. e.g. [Curves.linear] return an unmodified `t`.
-  /// Other useful curves:
-  /// - [Curves.easeInOutQuint] : Slow transition on the ends, Fast in the middle
-  /// - [Curves.slowMiddle] : Fast on the ends, Slow transition for middle
-  /// Tip:
-  /// If you don’t want the lighter and darker shades of a given
-  /// color to look washed out, you need to increase the saturation as the
-  /// lightness gets further away from 50%.
   factory ShadeColor2(
       {required double hue,
       required SL lightestShade,
       required SL darkestShade,
-      Curve alphaCurve = Curves.linear,
-      Curve saturationCurve = Curves.linear,
-      Curve lightnessCurve = Curves.linear,
+      ParametricCurve<double> alphaCurve = Curves.linear,
+      ParametricCurve<double> saturationCurve = Curves.linear,
+      ParametricCurve<double> lightnessCurve = Curves.linear,
       String? label}) {
     final shade100Hsl = HSLColor.fromAHSL(
         lightestShade.alpha, hue, lightestShade.saturation, lightestShade.lightness);
@@ -521,9 +526,9 @@ class ShadeColor2 extends Color2 {
   factory ShadeColor2.greyScale(
       {required double startLightness,
       required double endLightness,
-      Curve alphaCurve = Curves.linear,
-      Curve saturationCurve = Curves.linear,
-      Curve lightnessCurve = Curves.linear,
+      ParametricCurve<double> alphaCurve = Curves.linear,
+      ParametricCurve<double> saturationCurve = Curves.linear,
+      ParametricCurve<double> lightnessCurve = Curves.linear,
       double startAlpha = 1,
       double endAlpha = 1,
       String? label}) {
