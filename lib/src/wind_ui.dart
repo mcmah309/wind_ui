@@ -188,6 +188,49 @@ class Color2 extends MaterialColor {
   /// The label for this color e.g. "background" or "primary"
   final String? label;
 
+  /// The shade a quater the way between the lightest shade ([shade900]) and white.
+  @override
+  Color get shade50 => this[50]!;
+
+  /// The lightest shade.
+  @override
+  Color get shade100 => this[100]!;
+
+  /// The second lightest shade.
+  @override
+  Color get shade200 => this[200]!;
+
+  /// The third lightest shade.
+  @override
+  Color get shade300 => this[300]!;
+
+  /// The fourth lightest shade.
+  @override
+  Color get shade400 => this[400]!;
+
+  /// The default shade.
+  @override
+  Color get shade500 => this[500]!;
+
+  /// The fourth darkest shade.
+  @override
+  Color get shade600 => this[600]!;
+
+  /// The third darkest shade.
+  @override
+  Color get shade700 => this[700]!;
+
+  /// The second darkest shade.
+  @override
+  Color get shade800 => this[800]!;
+
+  /// The darkest shade.
+  @override
+  Color get shade900 => this[900]!;
+
+  /// The shade quater between the darkest shade ([shade900]) and black.
+  Color get shade950 => this[950]!;
+
   /// Equivlent to [shade50]
   HSLColor get shade50Hsl => HSLColor.fromColor(shade50);
 
@@ -217,6 +260,9 @@ class Color2 extends MaterialColor {
 
   /// Dark shade. Equivlent to [shade900]
   HSLColor get shade900Hsl => HSLColor.fromColor(shade900);
+
+  /// Equivlent to [shade950]
+  HSLColor get shade950Hsl => HSLColor.fromColor(shade950);
 
   // ignore: prefer_const_constructors_in_immutables
   Color2(super.primary, super.swatch, {this.label});
@@ -291,10 +337,10 @@ class Color2 extends MaterialColor {
       50: _interpolate(
               from: HSLColor.fromAHSL(shade100.alpha, shade100.hue, shade100.saturation, 1),
               to: shade100,
-              tAlpha: 0.5,
-              tHue: 0.5,
-              tSaturation: 0.5,
-              tLightness: 0.5)
+              tAlpha: 0.25,
+              tHue: 0.25,
+              tSaturation: 0.25,
+              tLightness: 0.25)
           .toColor(),
       100: shade100.toColor(),
       200: colorsC[1].toColor(),
@@ -304,7 +350,15 @@ class Color2 extends MaterialColor {
       600: colorsC[5].toColor(),
       700: colorsC[6].toColor(),
       800: colorsC[7].toColor(),
-      900: shade900.toColor()
+      900: shade900.toColor(),
+      950: _interpolate(
+              from: shade900,
+              to: HSLColor.fromAHSL(shade900.alpha, shade900.hue, shade900.saturation, 0),
+              tAlpha: 0.25,
+              tHue: 0.25,
+              tSaturation: 0.25,
+              tLightness: 0.25)
+          .toColor()
     };
     return Color2._(medium.value, swatch, label: label);
   }
@@ -402,10 +456,10 @@ class Color2 extends MaterialColor {
               from:
                   HSLColor.fromAHSL(shade100Hsl.alpha, shade100Hsl.hue, shade100Hsl.saturation, 1),
               to: shade100Hsl,
-              tAlpha: 0.5,
-              tHue: 0.5,
-              tSaturation: 0.5,
-              tLightness: 0.5)
+              tAlpha: 0.25,
+              tHue: 0.25,
+              tSaturation: 0.25,
+              tLightness: 0.25)
           .toColor(),
       100: shade100Hsl.toColor(),
       200: shade200Hsl.toColor(),
@@ -415,7 +469,15 @@ class Color2 extends MaterialColor {
       600: shade600Hsl.toColor(),
       700: shade700Hsl.toColor(),
       800: shade800Hsl.toColor(),
-      900: shade900Hsl.toColor()
+      900: shade900Hsl.toColor(),
+      950: _interpolate(
+              from: shade900Hsl,
+              to: HSLColor.fromAHSL(shade100Hsl.alpha, shade100Hsl.hue, shade100Hsl.saturation, 0),
+              tAlpha: 0.25,
+              tHue: 0.25,
+              tSaturation: 0.25,
+              tLightness: 0.25)
+          .toColor()
     };
 
     return Color2._(shade500.value, swatch, label: label);
@@ -460,19 +522,28 @@ class Color2 extends MaterialColor {
   }
 
   factory Color2.material(MaterialColor material, {String? label}) {
+    final nine = HSLColor.fromColor(material.shade900);
     return Color2._(
         material.value,
         {
-          50: material[50]!,
-          100: material[100]!,
-          200: material[200]!,
-          300: material[300]!,
-          400: material[400]!,
-          500: material[500]!,
-          600: material[600]!,
-          700: material[700]!,
-          800: material[800]!,
-          900: material[900]!
+          50: material.shade50,
+          100: material.shade100,
+          200: material.shade200,
+          300: material.shade300,
+          400: material.shade400,
+          500: material.shade500,
+          600: material.shade600,
+          700: material.shade700,
+          800: material.shade800,
+          900: material.shade900,
+          950: _interpolate(
+                  from: nine,
+                  to: HSLColor.fromAHSL(nine.alpha, nine.hue, nine.saturation, 0),
+                  tAlpha: 0.25,
+                  tHue: 0.25,
+                  tSaturation: 0.25,
+                  tLightness: 0.25)
+              .toColor()
         },
         label: label);
   }
@@ -490,7 +561,8 @@ class Color2 extends MaterialColor {
       600: color,
       700: color,
       800: color,
-      900: color
+      900: color,
+      950: color,
     });
     return Color2.material(material);
   }

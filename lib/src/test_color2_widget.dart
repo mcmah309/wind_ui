@@ -144,6 +144,19 @@ class TestColor2 extends StatelessWidget {
                 ),
               ],
             ),
+            const SizedBox(
+              width: 5,
+            ),
+            Column(
+              children: [
+                const Text("950"),
+                Container(
+                  width: 30,
+                  height: 30,
+                  color: color.shade950,
+                ),
+              ],
+            ),
           ],
         ),
         const SizedBox(height: 20),
