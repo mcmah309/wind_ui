@@ -172,6 +172,16 @@ abstract class BasicMaterialTheme
   }
 }
 
+/// Given linear position `t` between 0.0 and 1.0 (The two shades),
+/// return the new `t`. e.g. [Curves.linear] return an unmodified `t`.
+/// Other useful curves:
+/// - [Curves.easeInOutCubic] : Slow transition on the ends, Fast in the middle
+/// - [Curves.slowMiddle] : Fast on the ends, Slow transition for middle
+/// - [Curves.easeInCubic] : Slow at start, Fast at end
+/// - [Curves.easeOutCubic] : Fast at start, Slow at end
+/// All curves: https://api.flutter.dev/flutter/animation/Curves-class.html
+typedef Interpolation = ParametricCurve<double>;
+
 /// A redesigned version of the [MaterialColor] and [MaterialAccentColor] classes.
 // Dev Note: Cannot implement [MaterialColor] and [MaterialAccentColor] since each expects a different color (500 and 200) to be the primarys according to the doc.
 abstract class Color2 extends MaterialColor {
@@ -229,9 +239,9 @@ abstract class Color2 extends MaterialColor {
       {required double hue,
       SL lightestShade = const SL(saturation: 1, lightness: 1),
       SL darkestShade = const SL(saturation: 1, lightness: 0),
-      ParametricCurve<double> alphaCurve = Curves.linear,
-      ParametricCurve<double> saturationCurve = Curves.linear,
-      ParametricCurve<double> lightnessCurve = Curves.linear,
+      Interpolation alphaCurve = Curves.linear,
+      Interpolation saturationCurve = Curves.linear,
+      Interpolation lightnessCurve = Curves.linear,
       String? label}) {
     return ShadeColor2(
         hue: hue,
@@ -247,9 +257,9 @@ abstract class Color2 extends MaterialColor {
   factory Color2.greyScale(
       {required double startLightness,
       required double endLightness,
-      ParametricCurve<double> alphaCurve = Curves.linear,
-      ParametricCurve<double> saturationCurve = Curves.linear,
-      ParametricCurve<double> lightnessCurve = Curves.linear,
+      Interpolation alphaCurve = Curves.linear,
+      Interpolation saturationCurve = Curves.linear,
+      Interpolation lightnessCurve = Curves.linear,
       String? label}) {
     return ShadeColor2.greyScale(
         startLightness: startLightness,
@@ -392,20 +402,6 @@ class ExplictColor2 extends Color2 {
 }
 
 /// A color palet defined by transitioning between two shades of a hue.
-/// 
-/// For Curves:
-/// Given linear position `t` between 0.0 and 1.0 (The two shades),
-/// return the new `t`. e.g. [Curves.linear] return an unmodified `t`.
-/// Other useful curves:
-/// - [Curves.easeInOutCubic] : Slow transition on the ends, Fast in the middle
-/// - [Curves.slowMiddle] : Fast on the ends, Slow transition for middle
-/// - [Curves.easeInCubic] : Slow at start, Fast at end
-/// - [Curves.easeOutCubic] : Fast at start, Slow at end
-/// All curves: https://api.flutter.dev/flutter/animation/Curves-class.html
-/// Tip:
-/// If you don’t want the lighter and darker shades of a given
-/// color to look washed out, you need to increase the saturation as the
-/// lightness gets further away from 50%.
 class ShadeColor2 extends Color2 {
   final double hue;
   final SL lightestShade;
@@ -415,9 +411,9 @@ class ShadeColor2 extends Color2 {
       {required double hue,
       required SL lightestShade,
       required SL darkestShade,
-      ParametricCurve<double> alphaCurve = Curves.linear,
-      ParametricCurve<double> saturationCurve = Curves.linear,
-      ParametricCurve<double> lightnessCurve = Curves.linear,
+      Interpolation alphaCurve = Curves.linear,
+      Interpolation saturationCurve = Curves.linear,
+      Interpolation lightnessCurve = Curves.linear,
       String? label}) {
     final shade100Hsl = HSLColor.fromAHSL(
         lightestShade.alpha, hue, lightestShade.saturation, lightestShade.lightness);
@@ -526,9 +522,9 @@ class ShadeColor2 extends Color2 {
   factory ShadeColor2.greyScale(
       {required double startLightness,
       required double endLightness,
-      ParametricCurve<double> alphaCurve = Curves.linear,
-      ParametricCurve<double> saturationCurve = Curves.linear,
-      ParametricCurve<double> lightnessCurve = Curves.linear,
+      Interpolation alphaCurve = Curves.linear,
+      Interpolation saturationCurve = Curves.linear,
+      Interpolation lightnessCurve = Curves.linear,
       double startAlpha = 1,
       double endAlpha = 1,
       String? label}) {
