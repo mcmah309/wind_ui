@@ -24,11 +24,11 @@ class AppTheme extends FullTheme {
   @override
   Color2 get primary => Color2.material(Colors.amber);
 
-  // @override
-  // Color2 get secondary => throw UnimplementedError();
+  @override
+  Color2 get secondary => Color2.material(Colors.orange);
 
-  // @override
-  // Color2 get surface => throw UnimplementedError();
+  @override
+  Color2 get surface => Color2.color(Colors.white);
 
   // @override
   // Color2 get warning => throw UnimplementedError();
