@@ -240,6 +240,15 @@ class Color2Test extends StatelessWidget {
             test(Color2.material(Colors.red), "A material color"),
             test(
                 Color2.explict(
+                  shade100:
+                      HSLColor.fromColor(Colors.purple).withSaturation(0.1).withLightness(0.7),
+                  shade500: HSLColor.fromColor(Colors.purple).withSaturation(1),
+                  shade900:
+                      HSLColor.fromColor(Colors.purple).withSaturation(0.1).withLightness(0.3),
+                ),
+                "Explict: A lot of saturation in middle"),
+            test(
+                Color2.explict(
                     shade100: HSLColor.fromColor(Colors.blue),
                     shade900: HSLColor.fromColor(Colors.orange)),
                 "Explicit: Two very different colors - blue to orange"),

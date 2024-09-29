@@ -180,7 +180,7 @@ abstract class BasicMaterialTheme
 /// - [Curves.easeInCubic] : Slow at start, Fast at end
 /// - [Curves.easeOutCubic] : Fast at start, Slow at end
 /// All curves: https://api.flutter.dev/flutter/animation/Curves-class.html
-typedef Interpolation = ParametricCurve<double>;
+typedef Curve = ParametricCurve<double>;
 
 /// A redesigned version of the [MaterialColor] and [MaterialAccentColor] classes.
 // Dev Note: Cannot implement [MaterialColor] and [MaterialAccentColor] since each expects a different color (500 and 200) to be the primarys according to the doc.
@@ -233,6 +233,10 @@ class Color2 extends MaterialColor {
       HSLColor? shade700,
       HSLColor? shade800,
       required HSLColor shade900,
+      Curve alphaCurve = Curves.linear,
+      Curve hueCurve = Curves.linear,
+      Curve saturationCurve = Curves.linear,
+      Curve lightnessCurve = Curves.linear,
       String? label}) {
     List<HSLColor?> colors = [
       shade100,
@@ -267,7 +271,12 @@ class Color2 extends MaterialColor {
       double t = 1 / (nextColorIndex - lastIndex);
       assert(t < 1 && t > 0);
       return _interpolate(
-          from: lastColor, to: nextColor!, tAlpha: t, tHue: t, tSaturation: t, tLightness: t);
+          from: lastColor,
+          to: nextColor!,
+          tAlpha: alphaCurve.transform(t),
+          tHue: hueCurve.transform(t),
+          tSaturation: saturationCurve.transform(t),
+          tLightness: lightnessCurve.transform(t));
     }
 
     for (int index = 0; index < colors.length; index++) {
@@ -305,9 +314,9 @@ class Color2 extends MaterialColor {
       {required double hue,
       SL lightestShade = const SL(saturation: 1, lightness: 1),
       SL darkestShade = const SL(saturation: 1, lightness: 0),
-      Interpolation alphaCurve = Curves.linear,
-      Interpolation saturationCurve = Curves.linear,
-      Interpolation lightnessCurve = Curves.linear,
+      Curve alphaCurve = Curves.linear,
+      Curve saturationCurve = Curves.linear,
+      Curve lightnessCurve = Curves.linear,
       String? label}) {
     final shade100Hsl = HSLColor.fromAHSL(
         lightestShade.alpha, hue, lightestShade.saturation, lightestShade.lightness);
@@ -416,9 +425,9 @@ class Color2 extends MaterialColor {
   factory Color2.greyScale(
       {required double startLightness,
       required double endLightness,
-      Interpolation alphaCurve = Curves.linear,
-      Interpolation saturationCurve = Curves.linear,
-      Interpolation lightnessCurve = Curves.linear,
+      Curve alphaCurve = Curves.linear,
+      Curve saturationCurve = Curves.linear,
+      Curve lightnessCurve = Curves.linear,
       double startAlpha = 1,
       double endAlpha = 1,
       String? label}) {
@@ -523,7 +532,7 @@ HSLColor _interpolate(
   return HSLColor.fromAHSL(
     clampDouble(lerpDouble(from.alpha, to.alpha, tAlpha)!, 0.0, 1.0),
     lerpDouble(from.hue, to.hue, tHue)! % 360.0,
-    clampDouble(lerpDouble(from.saturation, from.saturation, tSaturation)!, 0.0, 1.0),
+    clampDouble(lerpDouble(from.saturation, to.saturation, tSaturation)!, 0.0, 1.0),
     clampDouble(lerpDouble(from.lightness, to.lightness, tLightness)!, 0.0, 1.0),
   );
 }
