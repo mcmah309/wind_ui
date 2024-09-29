@@ -184,7 +184,7 @@ typedef Interpolation = ParametricCurve<double>;
 
 /// A redesigned version of the [MaterialColor] and [MaterialAccentColor] classes.
 // Dev Note: Cannot implement [MaterialColor] and [MaterialAccentColor] since each expects a different color (500 and 200) to be the primarys according to the doc.
-abstract class Color2 extends MaterialColor {
+class Color2 extends MaterialColor {
   /// The label for this color e.g. "background" or "primary"
   final String? label;
 
@@ -221,7 +221,8 @@ abstract class Color2 extends MaterialColor {
   // ignore: prefer_const_constructors_in_immutables
   Color2(super.primary, super.swatch, {this.label});
 
-  /// A color defined by  interpolating by the provided shades.
+  /// Explictly provided color shades. Automatically filling any missing shades by interpolating between
+  /// the provided shades.
   factory Color2.explict(
       {required HSLColor shade100,
       HSLColor? shade200,
@@ -232,106 +233,7 @@ abstract class Color2 extends MaterialColor {
       HSLColor? shade700,
       HSLColor? shade800,
       required HSLColor shade900,
-      String? label}) = ExplictColor2;
-
-  /// A color defined by a hue curved between two shades.
-  factory Color2.shade(
-      {required double hue,
-      SL lightestShade = const SL(saturation: 1, lightness: 1),
-      SL darkestShade = const SL(saturation: 1, lightness: 0),
-      Interpolation alphaCurve = Curves.linear,
-      Interpolation saturationCurve = Curves.linear,
-      Interpolation lightnessCurve = Curves.linear,
       String? label}) {
-    return ShadeColor2(
-        hue: hue,
-        lightestShade: lightestShade,
-        darkestShade: darkestShade,
-        alphaCurve: alphaCurve,
-        saturationCurve: saturationCurve,
-        lightnessCurve: lightnessCurve,
-        label: label);
-  }
-
-  /// A grey scale color defined by interpolating between two lightness values in the gray scale.
-  factory Color2.greyScale(
-      {required double startLightness,
-      required double endLightness,
-      Interpolation alphaCurve = Curves.linear,
-      Interpolation saturationCurve = Curves.linear,
-      Interpolation lightnessCurve = Curves.linear,
-      String? label}) {
-    return ShadeColor2.greyScale(
-        startLightness: startLightness,
-        endLightness: endLightness,
-        alphaCurve: alphaCurve,
-        saturationCurve: saturationCurve,
-        lightnessCurve: lightnessCurve,
-        label: label);
-  }
-
-  /// A color defined by interpolation the entire lightness scale.
-  factory Color2.fullLightScale(double hue, {double saturation = 1}) {
-    return ShadeColor2.fullLightScale(hue, saturation: saturation);
-  }
-
-  factory Color2.material(MaterialColor material) {
-    return material.toColor2();
-  }
-
-  /// Turns a [Color] into a [Color2]. All shades will be the same color. Prefer [fullLightScale],[shade], or [explicit] if you want the color
-  /// to be different shades.
-  factory Color2.color(Color color) {
-    final material = MaterialColor2(color.value, {
-      50: color,
-      100: color,
-      200: color,
-      300: color,
-      400: color,
-      500: color,
-      600: color,
-      700: color,
-      800: color,
-      900: color
-    });
-    return Color2.material(material);
-  }
-
-  /// Convert this color to a [MaterialAccentColor].
-  MaterialAccentColor toMaterialAccentColor(
-      {int shade100 = 100, int shade200 = 200, int shade400 = 400, int shade700 = 700}) {
-    final twoHundred = this[shade200]!;
-    final swatch = {
-      100: this[shade100]!,
-      200: twoHundred,
-      400: this[shade400]!,
-      700: this[shade700]!
-    };
-
-    return MaterialAccentColor(twoHundred.value, swatch);
-  }
-
-  @override
-  String toString() {
-    return label == null ? "Color2" : "Color2(\"$label\")";
-  }
-}
-
-/// Explictly provided color. Automatically filling any missing shades by linearly interpolating between
-/// the provided shades.
-class ExplictColor2 extends Color2 {
-  factory ExplictColor2({
-    required HSLColor shade100,
-    HSLColor? shade200,
-    HSLColor? shade300,
-    HSLColor? shade400,
-    HSLColor? shade500,
-    HSLColor? shade600,
-    HSLColor? shade700,
-    HSLColor? shade800,
-    required HSLColor shade900,
-    String? label,
-  }) {
     List<HSLColor?> colors = [
       shade100,
       shade200,
@@ -395,22 +297,14 @@ class ExplictColor2 extends Color2 {
       800: colorsC[7].toColor(),
       900: shade900.toColor()
     };
-    return ExplictColor2._(medium.value, swatch, label: label);
+    return Color2._(medium.value, swatch, label: label);
   }
 
-  ExplictColor2._(super.primary, super.swatch, {super.label});
-}
-
-/// A color palet defined by transitioning between two shades of a hue.
-class ShadeColor2 extends Color2 {
-  final double hue;
-  final SL lightestShade;
-  final SL darkestShade;
-
-  factory ShadeColor2(
+  /// A color palet defined by transitioning between two shades of a hue.
+  factory Color2.shade(
       {required double hue,
-      required SL lightestShade,
-      required SL darkestShade,
+      SL lightestShade = const SL(saturation: 1, lightness: 1),
+      SL darkestShade = const SL(saturation: 1, lightness: 0),
       Interpolation alphaCurve = Curves.linear,
       Interpolation saturationCurve = Curves.linear,
       Interpolation lightnessCurve = Curves.linear,
@@ -515,11 +409,11 @@ class ShadeColor2 extends Color2 {
       900: shade900Hsl.toColor()
     };
 
-    return ShadeColor2._(shade500.value, swatch,
-        hue: hue, lightestShade: lightestShade, darkestShade: darkestShade, label: label);
+    return Color2._(shade500.value, swatch, label: label);
   }
 
-  factory ShadeColor2.greyScale(
+  /// A grey scale color defined by interpolating between two lightness values in the gray scale.
+  factory Color2.greyScale(
       {required double startLightness,
       required double endLightness,
       Interpolation alphaCurve = Curves.linear,
@@ -528,7 +422,7 @@ class ShadeColor2 extends Color2 {
       double startAlpha = 1,
       double endAlpha = 1,
       String? label}) {
-    return ShadeColor2(
+    return Color2.shade(
         hue: 0,
         lightestShade: SL(saturation: 0, lightness: startLightness, alpha: startAlpha),
         darkestShade: SL(saturation: 0, lightness: endLightness, alpha: endAlpha),
@@ -538,19 +432,70 @@ class ShadeColor2 extends Color2 {
         label: label);
   }
 
-  factory ShadeColor2.fullLightScale(double hue, {double saturation = 1}) {
-    return ShadeColor2(
+  /// A color defined by interpolation the entire lightness scale.
+  factory Color2.fullLightScale(double hue, {double saturation = 1, String? label}) {
+    return Color2.shade(
         hue: hue,
         lightestShade: SL(saturation: saturation, lightness: 1),
         darkestShade: SL(saturation: saturation, lightness: 0));
   }
 
-  ShadeColor2._(super.primary, super.swatch,
-      {required this.hue, required this.lightestShade, required this.darkestShade, super.label});
-}
+  factory Color2.material(MaterialColor material, {String? label}) {
+    return Color2._(
+        material.value,
+        {
+          50: material[50]!,
+          100: material[100]!,
+          200: material[200]!,
+          300: material[300]!,
+          400: material[400]!,
+          500: material[500]!,
+          600: material[600]!,
+          700: material[700]!,
+          800: material[800]!,
+          900: material[900]!
+        },
+        label: label);
+  }
 
-class MaterialColor2 extends Color2 {
-  MaterialColor2(super.primary, super.swatch, {super.label});
+  /// Turns a [Color] into a [Color2]. All shades will be the same color. Prefer [fullLightScale],[shade], or [explicit] if you want the color
+  /// to be different shades.
+  factory Color2.color(Color color) {
+    final material = Color2._(color.value, {
+      50: color,
+      100: color,
+      200: color,
+      300: color,
+      400: color,
+      500: color,
+      600: color,
+      700: color,
+      800: color,
+      900: color
+    });
+    return Color2.material(material);
+  }
+
+  /// Convert this color to a [MaterialAccentColor].
+  MaterialAccentColor toMaterialAccentColor(
+      {int shade100 = 100, int shade200 = 200, int shade400 = 400, int shade700 = 700}) {
+    final twoHundred = this[shade200]!;
+    final swatch = {
+      100: this[shade100]!,
+      200: twoHundred,
+      400: this[shade400]!,
+      700: this[shade700]!
+    };
+
+    return MaterialAccentColor(twoHundred.value, swatch);
+  }
+
+  const Color2._(super.primary, super.swatch, {this.label});
+
+  @override
+  String toString() {
+    return label == null ? "Color2" : "Color2(\"$label\")";
+  }
 }
 
 //************************************************************************//
@@ -584,21 +529,21 @@ HSLColor _interpolate(
 }
 
 class Colors2 {
-  static final Color2 greyNeutral = ExplictColor2(
+  static final Color2 greyNeutral = Color2.explict(
       shade100: const HSLColor.fromAHSL(1, 0, 0, 0.88),
       shade300: const HSLColor.fromAHSL(1, 0, 0, 0.76),
       shade500: const HSLColor.fromAHSL(1, 0, 0, 0.58),
       shade700: const HSLColor.fromAHSL(1, 0, 0, 0.43),
       shade900: const HSLColor.fromAHSL(1, 0, 0, 0.28));
 
-  static final Color2 greyCool = ExplictColor2(
+  static final Color2 greyCool = Color2.explict(
       shade100: const HSLColor.fromAHSL(1, 208, 0.21, 0.88),
       shade300: const HSLColor.fromAHSL(1, 210, 0.16, 0.76),
       shade500: const HSLColor.fromAHSL(1, 208, 0.12, 0.58),
       shade700: const HSLColor.fromAHSL(1, 207, 0.12, 0.43),
       shade900: const HSLColor.fromAHSL(1, 209, 0.15, 0.28));
 
-  static final Color2 greyWarm = ExplictColor2(
+  static final Color2 greyWarm = Color2.explict(
       shade100: const HSLColor.fromAHSL(1, 39, 0.21, 0.88),
       shade300: const HSLColor.fromAHSL(1, 39, 0.16, 0.76),
       shade500: const HSLColor.fromAHSL(1, 39, 0.12, 0.58),
@@ -606,13 +551,13 @@ class Colors2 {
       shade900: const HSLColor.fromAHSL(1, 41, 0.15, 0.28));
 
   /// The dark side of the grey scale
-  static final Color2 greyScaleDark = ShadeColor2.greyScale(startLightness: 0.5, endLightness: 0);
+  static final Color2 greyScaleDark = Color2.greyScale(startLightness: 0.5, endLightness: 0);
 
   /// The light side of the grey scale
-  static final Color2 greyScaleLight = ShadeColor2.greyScale(startLightness: 1, endLightness: 0.5);
+  static final Color2 greyScaleLight = Color2.greyScale(startLightness: 1, endLightness: 0.5);
 
   /// The entire grey scale
-  static final Color2 greyScale = ShadeColor2.greyScale(startLightness: 1, endLightness: 0);
+  static final Color2 greyScale = Color2.greyScale(startLightness: 1, endLightness: 0);
 }
 
 class FontSize extends TextStyle {
@@ -625,19 +570,8 @@ class FontSize extends TextStyle {
 //************************************************************************//
 
 extension Color2OnMaterialColor on MaterialColor {
-  Color2 toColor2() {
-    return MaterialColor2(value, {
-      50: this[50]!,
-      100: this[100]!,
-      200: this[200]!,
-      300: this[300]!,
-      400: this[400]!,
-      500: this[500]!,
-      600: this[600]!,
-      700: this[700]!,
-      800: this[800]!,
-      900: this[900]!
-    });
+  Color2 toColor2({String? label}) {
+    return Color2.material(this, label: label);
   }
 }
 
