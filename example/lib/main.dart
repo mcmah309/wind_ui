@@ -239,25 +239,25 @@ class Color2Test extends StatelessWidget {
             test(Colors2.greyScaleLight, "Grey Scale Light"),
             test(Color2.material(Colors.red), "A material color"),
             test(
-                Color2.explict(
+                Color2.implicit(
                   shade100:
                       HSLColor.fromColor(Colors.purple).withSaturation(0.1).withLightness(0.7),
                   shade500: HSLColor.fromColor(Colors.purple).withSaturation(1),
                   shade900:
                       HSLColor.fromColor(Colors.purple).withSaturation(0.1).withLightness(0.3),
                 ),
-                "Explict: A lot of saturation in middle"),
+                "Implicit: A lot of saturation in middle"),
             test(
-                Color2.explict(
+                Color2.implicit(
                     shade100: HSLColor.fromColor(Colors.blue),
                     shade900: HSLColor.fromColor(Colors.orange)),
-                "Explicit: Two very different colors - blue to orange"),
+                "Implicit: Two very different colors - blue to orange"),
             test(
-                Color2.explict(
+                Color2.implicit(
                     shade100: HSLColor.fromColor(Colors.blue),
                     shade700: HSLColor.fromColor(Colors.purple),
                     shade900: HSLColor.fromColor(Colors.orange)),
-                "Explicit: Three very different colors - blue 100 to purple 700 to orange 900"),
+                "Implicit: Three very different colors - blue 100 to purple 700 to orange 900"),
             test(
                 Color2.shade(
                     hue: 189,
@@ -267,12 +267,12 @@ class Color2Test extends StatelessWidget {
             test(Color2.fullLightScale(57), "Yellow full lightness scale"),
             test(Color2.fullSaturationScale(57), "Yellow full saturation scale"),
             test(
-                Color2.explict(
+                Color2.implicit(
                     shade100: const HSLColor.fromAHSL(1, 30, 1, 0.5),
                     shade900: const HSLColor.fromAHSL(1, 30, 1, 0.5).decreaseBrightness(1)),
                 "Hue Rotation - Brightness Decrease"),
             test(
-                Color2.explict(
+                Color2.implicit(
                     shade100: const HSLColor.fromAHSL(1, 30, 1, 0.5),
                     shade900: const HSLColor.fromAHSL(1, 30, 1, 0.5).increaseBrightness(1)),
                 "Hue Rotation - Brightness Increase"),
