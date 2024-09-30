@@ -110,6 +110,7 @@ class Color2 extends MaterialColor {
     required Color shade800,
     required Color shade900,
     required Color shade950,
+    String? label,
   }) {
     final Map<int, Color> swatch = {
       50: shade50,
@@ -124,7 +125,7 @@ class Color2 extends MaterialColor {
       900: shade900,
       950: shade950
     };
-    return Color2._(shade500.value, swatch);
+    return Color2._(shade500.value, swatch, label: label);
   }
 
   /// Implicitly provided color shades. Automatically filling any missing shades by interpolating between
@@ -414,20 +415,23 @@ class Color2 extends MaterialColor {
 
   /// Turns a [Color] into a [Color2]. All shades will be the same color. Prefer [fullLightScale],[shade], or [explicit] if you want the color
   /// to be different shades.
-  factory Color2.color(Color color) {
-    final material = Color2._(color.value, {
-      50: color,
-      100: color,
-      200: color,
-      300: color,
-      400: color,
-      500: color,
-      600: color,
-      700: color,
-      800: color,
-      900: color,
-      950: color,
-    });
+  factory Color2.color(Color color, {String? label}) {
+    final material = Color2._(
+        color.value,
+        {
+          50: color,
+          100: color,
+          200: color,
+          300: color,
+          400: color,
+          500: color,
+          600: color,
+          700: color,
+          800: color,
+          900: color,
+          950: color,
+        },
+        label: label);
     return Color2.material(material);
   }
 
