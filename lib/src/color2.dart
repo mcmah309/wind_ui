@@ -18,7 +18,7 @@ class Color2 extends MaterialColor {
   /// The label for this color e.g. "background" or "primary"
   final String? label;
 
-  /// The shade a quater the way between the lightest shade ([shade900]) and white.
+  /// A step beyond the usual lightest shade.
   @override
   Color get shade50 => this[50]!;
 
@@ -58,7 +58,7 @@ class Color2 extends MaterialColor {
   @override
   Color get shade900 => this[900]!;
 
-  /// The shade quater between the darkest shade ([shade900]) and black.
+  /// A step beyond the usual darkest shade.
   Color get shade950 => this[950]!;
 
   /// Equivalent to [shade50]
@@ -194,37 +194,40 @@ class Color2 extends MaterialColor {
     }
     List<HSLColor> colorsC = colors.cast<HSLColor>();
 
-    final medium = colorsC[4].toColor();
+    final shade100C = shade100.toColor();
+    final shade200C = colorsC[1].toColor();
+    final shade300C = colorsC[2].toColor();
+    final shade400C = colorsC[3].toColor();
+    final shade500C = colorsC[4].toColor();
+    final shade600C = colorsC[5].toColor();
+    final shade700C = colorsC[6].toColor();
+    final shade800C = colorsC[7].toColor();
+    final shade900C = shade900.toColor();
+
     final Map<int, Color> swatch = {
       50: shade50?.toColor() ??
-          _interpolate(
-                  from: HSLColor.fromAHSL(shade100.alpha, shade100.hue, shade100.saturation, 1),
-                  to: shade100,
-                  tAlpha: 0.25,
-                  tHue: 0.25,
-                  tSaturation: 0.25,
-                  tLightness: 0.25)
-              .toColor(),
-      100: shade100.toColor(),
-      200: colorsC[1].toColor(),
-      300: colorsC[2].toColor(),
-      400: colorsC[3].toColor(),
-      500: medium,
-      600: colorsC[5].toColor(),
-      700: colorsC[6].toColor(),
-      800: colorsC[7].toColor(),
-      900: shade900.toColor(),
+          _relativeInterpolate(
+            from: HSLColor.fromColor(shade200C),
+            to: HSLColor.fromColor(shade100C),
+            percent: 0.5,
+          ).toColor(),
+      100: shade100C,
+      200: shade200C,
+      300: shade300C,
+      400: shade400C,
+      500: shade500C,
+      600: shade600C,
+      700: shade700C,
+      800: shade800C,
+      900: shade900C,
       950: shade950?.toColor() ??
-          _interpolate(
-                  from: shade900,
-                  to: HSLColor.fromAHSL(shade900.alpha, shade900.hue, shade900.saturation, 0),
-                  tAlpha: 0.25,
-                  tHue: 0.25,
-                  tSaturation: 0.25,
-                  tLightness: 0.25)
-              .toColor()
+          _relativeInterpolate(
+            from: HSLColor.fromColor(shade800C),
+            to: HSLColor.fromColor(shade900C),
+            percent: 0.5,
+          ).toColor()
     };
-    return Color2._(medium.value, swatch, label: label);
+    return Color2._(shade500C.value, swatch, label: label);
   }
 
   /// A color palet defined by transitioning between two shades of a hue.
@@ -286,8 +289,6 @@ class Color2 extends MaterialColor {
         tSaturation: saturationCurve.transform(tVal),
         tLightness: lightnessCurve.transform(tVal));
 
-    final shade500 = shade500Hsl.toColor();
-
     tVal = t(600);
     final shade600Hsl = _interpolate(
         from: shade100Hsl,
@@ -315,33 +316,36 @@ class Color2 extends MaterialColor {
         tSaturation: saturationCurve.transform(tVal),
         tLightness: lightnessCurve.transform(tVal));
 
+    final shade100 = shade100Hsl.toColor();
+    final shade200 = shade200Hsl.toColor();
+    final shade300 = shade300Hsl.toColor();
+    final shade400 = shade400Hsl.toColor();
+    final shade500 = shade500Hsl.toColor();
+    final shade600 = shade600Hsl.toColor();
+    final shade700 = shade700Hsl.toColor();
+    final shade800 = shade800Hsl.toColor();
+    final shade900 = shade900Hsl.toColor();
+
     final swatch = {
-      50: _interpolate(
-              from:
-                  HSLColor.fromAHSL(shade100Hsl.alpha, shade100Hsl.hue, shade100Hsl.saturation, 1),
-              to: shade100Hsl,
-              tAlpha: 0.25,
-              tHue: 0.25,
-              tSaturation: 0.25,
-              tLightness: 0.25)
-          .toColor(),
-      100: shade100Hsl.toColor(),
-      200: shade200Hsl.toColor(),
-      300: shade300Hsl.toColor(),
-      400: shade400Hsl.toColor(),
+      50: _relativeInterpolate(
+        from: HSLColor.fromColor(shade200),
+        to: HSLColor.fromColor(shade100),
+        percent: 0.5,
+      ).toColor(),
+      100: shade100,
+      200: shade200,
+      300: shade300,
+      400: shade400,
       500: shade500,
-      600: shade600Hsl.toColor(),
-      700: shade700Hsl.toColor(),
-      800: shade800Hsl.toColor(),
-      900: shade900Hsl.toColor(),
-      950: _interpolate(
-              from: shade900Hsl,
-              to: HSLColor.fromAHSL(shade100Hsl.alpha, shade100Hsl.hue, shade100Hsl.saturation, 0),
-              tAlpha: 0.25,
-              tHue: 0.25,
-              tSaturation: 0.25,
-              tLightness: 0.25)
-          .toColor()
+      600: shade600,
+      700: shade700,
+      800: shade800,
+      900: shade900,
+      950: _relativeInterpolate(
+        from: HSLColor.fromColor(shade800),
+        to: HSLColor.fromColor(shade900),
+        percent: 0.5,
+      ).toColor()
     };
 
     return Color2._(shade500.value, swatch, label: label);
@@ -386,7 +390,6 @@ class Color2 extends MaterialColor {
   }
 
   factory Color2.material(MaterialColor material, {String? label}) {
-    final nine = HSLColor.fromColor(material.shade900);
     return Color2._(
         material.value,
         {
@@ -400,14 +403,11 @@ class Color2 extends MaterialColor {
           700: material.shade700,
           800: material.shade800,
           900: material.shade900,
-          950: _interpolate(
-                  from: nine,
-                  to: HSLColor.fromAHSL(nine.alpha, nine.hue, nine.saturation, 0),
-                  tAlpha: 0.25,
-                  tHue: 0.25,
-                  tSaturation: 0.25,
-                  tLightness: 0.25)
-              .toColor()
+          950: _relativeInterpolate(
+            from: HSLColor.fromColor(material.shade800),
+            to: HSLColor.fromColor(material.shade900),
+            percent: 0.5,
+          ).toColor()
         },
         label: label);
   }
@@ -462,6 +462,24 @@ class SL {
   final double alpha;
 
   const SL({required this.saturation, required this.lightness, this.alpha = 1});
+}
+
+/// Interpolates relative to the last step size. [percent] of 1 meaning take the same step size, -1 take the same step
+/// size in the opposite direction. [to] will always be the reference, so if you want the opposite direction, switch
+/// the inputs.
+HSLColor _relativeInterpolate(
+    {required HSLColor from, required HSLColor to, required double percent}) {
+  final alphaStep = to.alpha - from.alpha;
+  final hueStep = to.hue - from.hue;
+  final saturationStep = to.saturation - from.saturation;
+  final lightnessStep = to.lightness - from.lightness;
+  final ref = to;
+  return HSLColor.fromAHSL(
+    clampDouble(ref.alpha + (alphaStep * percent), 0.0, 1.0),
+    (ref.hue + (hueStep * percent)) % 360.0,
+    clampDouble(ref.saturation + (saturationStep * percent), 0.0, 1.0),
+    clampDouble(ref.lightness + (lightnessStep * percent), 0.0, 1.0),
+  );
 }
 
 // Dev Note: Taken originally from [HSLColor.lerp]
