@@ -231,7 +231,7 @@ class Color2 extends MaterialColor {
     return Color2._(shade500C.value, swatch, label: label);
   }
 
-  /// A color palet defined by transitioning between two shades of a hue.
+  /// A color palette defined by transitioning between two shades of a hue.
   factory Color2.shade(
       {required double hue,
       SL lightestShade = const SL(saturation: 1, lightness: 1),
@@ -454,6 +454,60 @@ class Color2 extends MaterialColor {
   @override
   String toString() {
     return label == null ? "Color2" : "Color2(\"$label\")";
+  }
+
+  //************************************************************************//
+
+  /// Returns a new [Color2] with the fields of this color shifted by the provided percent towards the full field value
+  /// e.g. if the current lightness is 0.4 and argument [lightness] is 0.5, the resulting lightness will be 0.7.
+  Color2 withShift({double alpha = 0, double saturation = 0, double lightness = 0}) {
+    Color newColor(HSLColor shadeHsl) {
+      return HSLColor.fromAHSL(
+              clampDouble(shadeHsl.alpha + (1 - shadeHsl.alpha) * alpha, 0, 1),
+              shadeHsl.hue,
+              clampDouble(shadeHsl.saturation + (1 - shadeHsl.saturation) * saturation, 0, 1),
+              clampDouble(shadeHsl.lightness + (1 - shadeHsl.lightness) * lightness, 0, 1))
+          .toColor();
+    }
+
+    final shade50Hsl = this.shade50Hsl;
+    final newShade50 = newColor(shade50Hsl);
+    final shade100Hsl = this.shade100Hsl;
+    final newShade100 = newColor(shade100Hsl);
+    final shade200Hsl = this.shade200Hsl;
+    final newShade200 = newColor(shade200Hsl);
+    final shade300Hsl = this.shade300Hsl;
+    final newShade300 = newColor(shade300Hsl);
+    final shade400Hsl = this.shade400Hsl;
+    final newShade400 = newColor(shade400Hsl);
+    final shade500Hsl = this.shade500Hsl;
+    final newShade500 = newColor(shade500Hsl);
+    final shade600Hsl = this.shade600Hsl;
+    final newShade600 = newColor(shade600Hsl);
+    final shade700Hsl = this.shade700Hsl;
+    final newShade700 = newColor(shade700Hsl);
+    final shade800Hsl = this.shade800Hsl;
+    final newShade800 = newColor(shade800Hsl);
+    final shade900Hsl = this.shade900Hsl;
+    final newShade900 = newColor(shade900Hsl);
+    final shade950Hsl = this.shade950Hsl;
+    final newShade950 = newColor(shade950Hsl);
+
+    final swatch = {
+      50: newShade50,
+      100: newShade100,
+      200: newShade200,
+      300: newShade300,
+      400: newShade400,
+      500: newShade500,
+      600: newShade600,
+      700: newShade700,
+      800: newShade800,
+      900: newShade900,
+      950: newShade950
+    };
+
+    return Color2._(newShade500.value, swatch, label: label);
   }
 }
 
