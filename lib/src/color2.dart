@@ -509,6 +509,26 @@ class Color2 extends MaterialColor {
 
     return Color2._(newShade500.value, swatch, label: label);
   }
+
+/// Returns the explicit Dart code representation of this color palette. Useful for debugging the palette.
+  String debugPalette() {
+    return """
+Color2.explicit(
+  shade50: const ${shade100.toString()},
+  shade100: const ${shade100.toString()},
+  shade200: const ${shade200.toString()},
+  shade300: const ${shade300.toString()},
+  shade400: const ${shade400.toString()},
+  shade500: const ${shade500.toString()},
+  shade600: const ${shade600.toString()},
+  shade700: const ${shade700.toString()},
+  shade800: const ${shade800.toString()},
+  shade900: const ${shade900.toString()},
+  shade950: const ${shade950.toString()},
+  label: ${label == null ? "null" : '"$label"'},
+);
+""";
+  }
 }
 
 //************************************************************************//
