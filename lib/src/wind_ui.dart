@@ -4,33 +4,55 @@ import 'package:meta/meta.dart';
 import 'package:wind_ui/wind_ui.dart';
 
 /// The primary color used in the ui.
-abstract mixin class Primary {
+mixin Primary {
+  /// High-emphasis fills, texts, and icons against surface
   @mustBeOverridden
   Color2 get primary => Colors2.greyNeutral;
+
+  /// Text and icons against primary
+  @mustBeOverridden
+  Color2 get onPrimary => Colors2.greyNeutral;
 }
 
 /// The secondary color used in the ui.
-abstract mixin class Secondary {
+mixin Secondary on Primary {
+  /// Less prominent fills, text, and icons against surface
   @mustBeOverridden
-  Color2 get secondary => Colors2.greyNeutral;
+  Color2 get secondary => primary;
+
+  /// Text and icons against secondary
+  @mustBeOverridden
+  Color2 get onSecondary => onPrimary;
+}
+
+/// The tertiary color used in the ui.
+mixin Tertiary on Secondary {
+  /// Complementary fills, text, and icons against surface
+  @mustBeOverridden
+  Color2 get tertiary => secondary;
+
+  /// Text and icons against Tertiary
+  @mustBeOverridden
+  Color2 get onTertiary => onSecondary;
 }
 
 /// Backgrounds and large, low-emphasis areas of the screen.
-abstract mixin class Surface {
+mixin Surface {
   /// Backgrounds and large, low-emphasis areas of the screen. Usually [shade100] is somehting akin to white.
   @mustBeOverridden
   Color2 get surface => Colors2.greyNeutral;
+
+  /// Text and icons against surface
+  @mustBeOverridden
+  Color2 get onSurface => Colors2.greyNeutral;
 }
 
 /// The colors used to communicate basic different types of information.
-abstract mixin class CommunicationAccents {
+mixin CommunicationAccents {
+  /// Attention highlight like "new feature"
   /// The color used for primary actions that do not have a neutral connotation
   /// e.g. "go to page" is not positive or negative. This can be the primary or secondary color,
-  /// but differnet shades will likely be used than the usual uses of primary or secondary.
-  @mustBeOverridden
-  Color2 get action => Colors2.greyNeutral;
-
-  /// Attention hightlight like "new feature".
+  /// but different shades will likely be used than the usual uses of primary or secondary.
   @mustBeOverridden
   Color2 get focalPoint => Colors2.greyNeutral;
 
@@ -48,32 +70,32 @@ abstract mixin class CommunicationAccents {
 }
 
 /// Neutral accent color used for low-emphasis areas of the screen. Often shades of grey
-abstract mixin class NeutralAccent {
+mixin NeutralAccent {
   /// Neutral accent color used for low-emphasis areas of the screen. Often shades of grey
   Color2 get neutral => Colors2.greyNeutral;
 }
 
-abstract mixin class TextSelectionAccent {
+mixin TextSelectionAccent {
   @mustBeOverridden
   Color2 get textSelection => Colors2.greyCool;
   @mustBeOverridden
   Color2 get textSelectionCursor => Colors2.greyCool;
 }
 
-/// The default decorations. Any variations from the default should probably be made relative to
+/// The default container decorations. Any variations from the default should probably be made relative to
 /// the default e.g.
 /// ```dart
 ///  final differentShadow = shadow + x;
 /// ```
-// Dev Note: Things like "border color" are not included since they are usally dependent on the colors
-// currently being worked with, while something like "shadow color" is usually consistant.
-abstract mixin class Decoration {
-  /// The radious on the corners of objects.
+// Dev Note: Things like "border color" are not included since they are usually dependent Jon the colors
+// currently being worked with, while something like "shadow color" is usually consistent.
+mixin ContainerStyle {
+  /// The radius on the corners of objects, aka border radius.
   ///
   /// A small border radius is pretty neutral, and doesn’t really communicate
   /// much of a personality on its own, while a large border radius starts to feel more playful,
   /// and no border radius at all feels a lot more serious or formal.
-  double get borderRadius => 0;
+  double get cornerRadius => 0;
 
   /// The shadow color.
   Color2 get shadow => Colors2.greyScaleDark;
@@ -82,11 +104,7 @@ abstract mixin class Decoration {
   double get shadowRadius => 3;
 }
 
-abstract mixin class Brightness {
-  material.Brightness get brightness => material.Brightness.light;
-}
-
-abstract mixin class Font {
+mixin FontStyle {
   FontSize get textXs => const FontSize(fontSize: 12, height: 1 + 1 / 3);
   FontSize get textSm => const FontSize(fontSize: 14, height: 1 + 3 / 7);
   FontSize get textBase => const FontSize(fontSize: 16, height: 1.25);
@@ -113,64 +131,86 @@ abstract mixin class Font {
 
   /// Font family
   TextTheme get fontFamily => Typography.blackCupertino;
-
-  /// For on dark backgrounds
-  Color2 get textLight => Colors2.greyScaleLight;
-
-  /// For on light backgrounds
-  Color2 get textDark => Colors2.greyScaleDark;
 }
 
-abstract class FullTheme extends BasicMaterialTheme
+abstract class FullTheme extends FullMaterialTheme
     with
         Primary,
         Secondary,
+        Tertiary,
         Surface,
         CommunicationAccents,
         NeutralAccent,
         TextSelectionAccent,
-        Decoration,
-        Brightness,
-        Font {
+        ContainerStyle,
+        FontStyle {}
+
+abstract class FullMaterialTheme extends BasicMaterialTheme
+    with Tertiary, ContainerStyle, TextSelectionAccent, ContainerStyle {
   @override
   ThemeData createMaterialThemeData() {
-    final themeData = super.createMaterialThemeData();
-    return themeData.copyWith(
-        colorScheme: themeData.colorScheme.copyWith(shadow: shadow),
-        shadowColor: shadow,
+    final brightness = ThemeData.estimateBrightnessForColor(primary);
+
+    final colorScheme = ColorScheme(
+      primary: primary,
+      secondary: secondary,
+      tertiary: tertiary,
+      surface: surface,
+      error: destructive,
+      onPrimary: onPrimary,
+      onSecondary: onSecondary,
+      onTertiary: onTertiary,
+      onSurface: onSurface,
+      onError: Colors.white,
+      shadow: shadow,
+      brightness: brightness,
+    );
+    final bool isDark = colorScheme.brightness == Brightness.dark;
+
+    // For surfaces that use primary color in light themes and surface color in dark
+    final Color primarySurfaceColor = isDark ? colorScheme.surface : colorScheme.primary;
+    final Color onPrimarySurfaceColor = isDark ? colorScheme.onSurface : colorScheme.onPrimary;
+
+    return ThemeData(
+        colorScheme: colorScheme,
+        brightness: colorScheme.brightness,
+        primaryColor: primarySurfaceColor,
+        canvasColor: colorScheme.surface,
+        scaffoldBackgroundColor: colorScheme.surface,
+        cardColor: colorScheme.surface,
+        dividerColor: colorScheme.onSurface.withOpacity(0.12),
+        dialogBackgroundColor: colorScheme.surface,
+        indicatorColor: onPrimarySurfaceColor,
+        textTheme: fontFamily,
+        applyElevationOverlayColor: isDark,
+        useMaterial3: true,
+        //
         textSelectionTheme: TextSelectionThemeData(
             selectionColor: textSelection,
             selectionHandleColor: textSelectionCursor,
-            cursorColor: textSelectionCursor));
+            cursorColor: textSelectionCursor),
+        primaryTextTheme: fontFamily);
   }
 }
 
 /// Minimum specification needed to create a material theme
-abstract class BasicMaterialTheme
-    with Primary, Secondary, Surface, CommunicationAccents, Brightness, Font {
+abstract class BasicMaterialTheme with Primary, Secondary, Surface, CommunicationAccents, FontStyle {
   ThemeData createMaterialThemeData() {
-    final bool isDark = brightness == material.Brightness.dark;
-    final bool primaryIsDark =
-        ThemeData.estimateBrightnessForColor(primary) == material.Brightness.dark;
-    final bool secondaryIsDark =
-        ThemeData.estimateBrightnessForColor(secondary) == material.Brightness.dark;
-
     final colorScheme = ColorScheme(
       primary: primary,
       secondary: secondary,
       surface: surface,
       error: destructive,
-      onPrimary: primaryIsDark ? Colors.white : Colors.black,
-      onSecondary: secondaryIsDark ? Colors.white : Colors.black,
-      onSurface: isDark ? Colors.white : Colors.black,
-      onError: isDark ? Colors.black : Colors.white,
-      brightness: brightness,
+      onPrimary: onPrimary,
+      onSecondary: onSecondary,
+      onSurface: onSurface,
+      onError: Colors.white,
+      brightness: ThemeData.estimateBrightnessForColor(primary),
     );
 
     return ThemeData.from(colorScheme: colorScheme, textTheme: fontFamily, useMaterial3: true);
   }
 }
-
 
 class FontSize extends TextStyle {
   @override
