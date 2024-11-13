@@ -76,7 +76,7 @@ class _MyHomePageState extends State<MyHomePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Theme.of(context).colorScheme.inversePrimary,
+        backgroundColor: appTheme.primary,
         title: Text(widget.title),
       ),
       body: body ??
@@ -89,7 +89,7 @@ class _MyHomePageState extends State<MyHomePage> {
                 ),
                 Text(
                   '$_counter',
-                  style: Theme.of(context).textTheme.headlineMedium,
+                  style: appTheme.text2Xl,
                 ),
               ],
             ),
