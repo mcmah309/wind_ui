@@ -595,8 +595,8 @@ extension HSLColorExtension on HSLColor {
   HSLColor increaseBrightness(double percent) {
     assert(percent >= 0 && percent <= 1);
     double hue = this.hue;
-    int closest = _maxsHues.first;
-    for (final maxHue in _maxsHues.skip(1)) {
+    int closest = _maxHues.first;
+    for (final maxHue in _maxHues.skip(1)) {
       if ((hue - maxHue).abs() < (hue - closest).abs()) {
         closest = maxHue;
       }
@@ -605,7 +605,7 @@ extension HSLColorExtension on HSLColor {
     return HSLColor.fromAHSL(alpha, hue, saturation, lightness);
   }
 
-  /// Decrease the "precieved" brightness (color theory) of the color by rotating the hue towards the closest min brightness hue.
+  /// Decrease the "perceived" brightness (color theory) of the color by rotating the hue towards the closest min brightness hue.
   /// [percent] is a value between 0.0 and 1.0.
   /// Useful for highlight colors. To get a good visual effect you will likely still need to adjust "saturation" and "lightness".
   /// Based on: pg 135 of "refactor ui" by Adam Watham & Steve Schoger
@@ -623,16 +623,16 @@ extension HSLColorExtension on HSLColor {
   }
 }
 
-/// hue to precieved brightness value, when saturation is 100% and luminosity is 50%.
+/// hue to perceived brightness value, when saturation is 100% and luminosity is 50%.
 /// Following sqrt( 0.299*R^2 + 0.587*G^2 + 0.114*B^2 ) / 255 . Source: https://stackoverflow.com/a/596243/11839191
 /// ```dart
-/// double precievedBrightness(Color color) {
+/// double perceivedBrightness(Color color) {
 ///   return math.sqrt(0.299 * (color.red ^ 2) + 0.587 * (color.green ^ 2) + 0.114 * (color.blue ^ 2)) / 255;
 /// }
 /// ```
-/// Also referrenced by pg 135 of "refactor ui" by Adam Watham & Steve Schoger
+/// Also referenced by pg 135 of "refactor ui" by Adam Watham & Steve Schoger
 // ignore: unused_element
-const Map<int, double> _precievedBrightnessMap = {
+const Map<int, double> _perceivedBrightnessMap = {
   0: 0.5468089246, // min
   30: 0.6685082178,
   60: 0.9412757301, // max
@@ -647,5 +647,5 @@ const Map<int, double> _precievedBrightnessMap = {
   330: 0.5724718052
 };
 
-const List<int> _maxsHues = [60, 180, 300];
+const List<int> _maxHues = [60, 180, 300];
 const List<int> _minHues = [0, 120, 240];
