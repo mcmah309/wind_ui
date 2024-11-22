@@ -75,6 +75,12 @@ mixin NeutralAccent {
   Color2 get neutral => Colors2.greyNeutral;
 }
 
+mixin WhiteAndBlack {
+  Color2 get white => Colors2.white;
+
+  Color2 get black => Colors2.black;
+}
+
 mixin TextSelectionAccent {
   @mustBeOverridden
   Color2 get textSelection => Colors2.greyCool;
@@ -143,7 +149,8 @@ abstract class FullTheme extends FullMaterialTheme
         NeutralAccent,
         TextSelectionAccent,
         ContainerStyle,
-        FontStyle {}
+        FontStyle,
+        WhiteAndBlack {}
 
 abstract class FullMaterialTheme extends BasicMaterialTheme
     with Tertiary, ContainerStyle, TextSelectionAccent, ContainerStyle {
@@ -194,7 +201,8 @@ abstract class FullMaterialTheme extends BasicMaterialTheme
 }
 
 /// Minimum specification needed to create a material theme
-abstract class BasicMaterialTheme with Primary, Secondary, Surface, CommunicationAccents, FontStyle {
+abstract class BasicMaterialTheme
+    with Primary, Secondary, Surface, CommunicationAccents, FontStyle {
   ThemeData createMaterialThemeData() {
     final colorScheme = ColorScheme(
       primary: primary,

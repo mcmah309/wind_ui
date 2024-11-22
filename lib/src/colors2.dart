@@ -1,4 +1,4 @@
-import 'package:flutter/painting.dart';
+import 'package:flutter/material.dart';
 import 'package:wind_ui/wind_ui.dart';
 
 class Colors2 {
@@ -31,6 +31,10 @@ class Colors2 {
 
   /// The entire grey scale
   static final Color2 greyScale = Color2.greyScale(startLightness: 1, endLightness: 0);
+
+  static final Color2 white = Color2.color(Colors.white);
+
+  static final Color2 black = Color2.color(Colors.black);
 
   // Tailwind colors: https://tailwindcss.com/docs/customizing-colors
   //************************************************************************//
